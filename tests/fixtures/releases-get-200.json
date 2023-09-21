@@ -1,0 +1,21 @@
+{
+    "release": 
+    {
+        "bundle_prn": "bundle_prn",
+        "cohort_prn": "cohort_prn",
+        "description": "description",
+        "inserted_at": "2000-01-01T00:00:00Z",
+        "name": "name",
+        "next_release_prn": "next_release_prn",
+        "organization_prn": "organization_prn",
+        "phase_type": "static",
+        "phase_value": 1,
+        "previous_release_prn": "previous_release_prn",
+        "required": true,
+        "schedule_date": "2000-01-01T00:00:00Z",
+        "schedule_complete": true,
+        "prn": "prn",
+        "updated_at": "2000-01-01T00:00:00Z"
+    }
+
+}

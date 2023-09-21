@@ -1,0 +1,11 @@
+{
+    "artifact_version": {
+        "artifact_prn": "artifact_prn",
+        "description": "description",
+        "inserted_at": "2000-01-01T00:00:00Z",
+        "organization_prn": "organization_prn",
+        "prn": "prn",
+        "version": "v0.0.1",
+        "updated_at": "2000-01-01T00:00:00Z"
+    }
+}

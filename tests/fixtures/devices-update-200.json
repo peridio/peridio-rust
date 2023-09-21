@@ -1,0 +1,14 @@
+{
+    "data": {
+        "description": "test-updated",
+        "healthy": true,
+        "identifier": "a",
+        "last_communication": "new-date",
+        "tags": [
+            "tag-1",
+            "tag-2"
+        ],
+        "status": "offline",
+        "version": "1.0.0"
+    }
+}

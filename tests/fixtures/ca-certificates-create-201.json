@@ -1,0 +1,16 @@
+{
+    "data": {
+        "description": "test",
+        "not_after": "then",
+        "not_before": "now",
+        "serial": "serial",
+        "jitp": {
+            "description": "jitp-test",
+            "product_name": "pro-1",
+            "tags": [
+                "tag-1"
+            ],
+            "cohort_prn": "test"
+        }
+    }
+}

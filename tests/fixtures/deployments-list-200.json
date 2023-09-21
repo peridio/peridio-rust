@@ -1,0 +1,32 @@
+{
+    "data": [
+        {
+            "conditions": {
+                "tags": [
+                    "tag-1",
+                    "tag-2"
+                ],
+                "version": "1.0.0"
+            },
+            "is_active": false,
+            "name": "a",
+            "state": "off",
+            "firmware_uuid": "4dd9ff49-ec74-45fc-8558-7f98839019ec",
+            "delta_updatable": true
+        },
+        {
+            "conditions": {
+                "tags": [
+                    "tag-3",
+                    "tag-4"
+                ],
+                "version": "2.0.0"
+            },
+            "is_active": false,
+            "name": "b",
+            "state": "off",
+            "firmware_uuid": "1634a3c6-00d2-4cfe-8e2a-d7d1473c940a",
+            "delta_updatable": true
+        }
+    ]
+}

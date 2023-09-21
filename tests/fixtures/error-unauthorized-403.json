@@ -1,0 +1,11 @@
+{
+  "errors": [
+    {
+      "code": "unauthorized",
+      "context": {
+        "resource_id": null,
+        "scope_name": "create_element_versions"
+      }
+    }
+  ]
+}

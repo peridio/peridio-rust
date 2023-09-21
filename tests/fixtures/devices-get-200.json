@@ -1,0 +1,26 @@
+{
+  "data": {
+    "description": "test",
+    "firmware_metadata": {
+      "architecture": "arm",
+      "author": "sagan",
+      "description": "it is what it is",
+      "fwup_version": "1.9.1",
+      "misc": "who knows",
+      "platform": "rock_solid",
+      "product": "of my circumstances",
+      "uuid": "c7a000a0-78bd-47d5-8944-6ee9c18aa0a4",
+      "vcs_identifier": "88abe2e",
+      "version": "unknown"
+    },
+    "healthy": false,
+    "identifier": "a",
+    "last_communication": "date",
+    "status": "offline",
+    "tags": [
+      "tag-1",
+      "tag-2"
+    ],
+    "version": "1.0.0"
+  }
+}

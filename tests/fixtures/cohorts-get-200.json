@@ -1,0 +1,13 @@
+{
+    "cohort": 
+    {
+        "description": "string",
+        "name": "a",
+        "organization_prn": "1",
+        "prn": "2",
+        "inserted_at": "2019-08-24T14:15:22Z",
+        "product_prn": "string",
+        "updated_at": "2019-08-24T14:15:22Z"
+    }
+
+}

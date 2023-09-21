@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "architecture": "arm64",
+      "author": "org-1",
+      "inserted_at": "2019-08-24T14:15:22Z",
+      "platform": "rpi",
+      "product": "test",
+      "updated_at": "2019-08-24T14:15:22Z",
+      "uuid": "4dd9ff49-ec74-45fc-8558-7f98839019ec",
+      "vcs_identifier": "d670460b4b4aece5915caf5c68d12f560a9fe3e4",
+      "version": "1.0.0"
+    },
+    {
+      "architecture": "arm64",
+      "author": "org-1",
+      "inserted_at": "2020-11-04T16:20:00Z",
+      "platform": "rpi",
+      "product": "test-2",
+      "updated_at": "2020-11-04T16:20:00Z",
+      "uuid": "1905eef3-f946-4b48-8584-dfc3e344ba87",
+      "vcs_identifier": "d670460b4b4aece5915caf5c68d12f560a9fe3e4",
+      "version": "2.0.0"
+    }
+  ]
+}

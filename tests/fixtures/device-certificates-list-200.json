@@ -1,0 +1,14 @@
+{
+    "data": [
+        {
+            "not_after": "then-0",
+            "not_before": "now-0",
+            "serial": "serial-0"
+        },
+        {
+            "not_after": "then-1",
+            "not_before": "now-1",
+            "serial": "serial-1"
+        }
+    ]
+}

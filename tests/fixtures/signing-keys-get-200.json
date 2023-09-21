@@ -1,0 +1,10 @@
+{
+  "signing_key": {
+    "value": "a",
+    "name": "b",
+    "inserted_at": "date1",
+    "organization_prn": "string",
+    "prn": "string",
+    "updated_at": "date2"
+  }
+}
