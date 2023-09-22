@@ -36,13 +36,13 @@ impl FromStr for BinaryState {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct BinarySignature {
     pub signature: String,
     pub signing_key_prn: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Binary {
     pub artifact_version_prn: String,
     pub description: Option<String>,

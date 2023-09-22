@@ -38,12 +38,9 @@ pub struct CreateBinaryPartResponse {
 #[derive(Debug, Serialize)]
 pub struct ListBinaryPartsParams {
     pub binary_prn: String,
-    pub limit: Option<u8>,
-    pub order: Option<String>,
-    pub page: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ListBinaryPart {
     pub binary_prn: Option<String>,
     pub hash: String,
@@ -69,6 +66,9 @@ impl<'a> BinaryPartsApi<'a> {
         &'a self,
         params: CreateBinaryPartParams,
     ) -> Result<Option<CreateBinaryPartResponse>, Error> {
+        let part_number = params.index as u64;
+        let index = part_number - 1;
+
         self.0
             .execute_with_headers(
                 Method::PUT,
@@ -80,8 +80,8 @@ impl<'a> BinaryPartsApi<'a> {
                         "bytes {}-{}/{}",
                         // size is the total length, here is 0 indexed so we subtract 1
                         // if index = 0, start = 0 * (size - 1) = 0, end = (size - 1) * (0 + 1) = (size - 1) = total size zero indexed
-                        params.index as u64 * (params.size - 1),
-                        (params.size - 1) * (params.index as u64 + 1),
+                        index * params.size,
+                        (params.size * part_number) - 1,
                         params.expected_binary_size
                     ),
                 )],
