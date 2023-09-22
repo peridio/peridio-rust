@@ -117,6 +117,7 @@ macro_rules! multipart_body {
     };
 }
 
+#[derive(Debug, Clone)]
 pub struct Api {
     api_key: String,
     endpoint: String,
