@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use reqwest::Method;
 
 use serde::{Deserialize, Serialize};
@@ -6,6 +8,31 @@ use crate::{json_body, Api};
 
 use super::Error;
 use snafu::ResultExt;
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum BinaryPartState {
+    Uploadable,
+    InvalidSize,
+    InvalidHash,
+    Valid,
+}
+
+impl FromStr for BinaryPartState {
+    type Err = Error;
+
+    fn from_str(input: &str) -> Result<BinaryPartState, Self::Err> {
+        match input {
+            "uploadable" => Ok(BinaryPartState::Uploadable),
+            "invalid_size" => Ok(BinaryPartState::InvalidHash),
+            "invalid_hash" => Ok(BinaryPartState::InvalidSize),
+            "valid" => Ok(BinaryPartState::Valid),
+            _ => Err(Error::Unknown {
+                error: format!("given binary part state '{input}' is not supported"),
+            }),
+        }
+    }
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct BinaryPart {
@@ -16,7 +43,7 @@ pub struct BinaryPart {
     pub organization_prn: String,
     pub prn: String,
     pub size: u64,
-    pub state: String,
+    pub state: BinaryPartState,
     pub updated_at: String,
     pub presigned_upload_url: String,
 }
@@ -49,7 +76,7 @@ pub struct ListBinaryPart {
     pub organization_prn: String,
     pub prn: String,
     pub size: u64,
-    pub state: String,
+    pub state: BinaryPartState,
     pub updated_at: String,
 }
 
