@@ -104,6 +104,12 @@ pub struct UpdateBinaryParams {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub state: Option<BinaryState>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub hash: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub size: Option<u64>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
