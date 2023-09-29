@@ -20,6 +20,8 @@ async fn create_release() {
     let expected_phase_value = 1.0;
     let expected_required = true;
     let expected_schedule_date = "2000-01-01T00:00:00Z";
+    let expected_version = "1.0.0";
+    let expected_version_requirement = "= 1.0.0";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -44,6 +46,8 @@ async fn create_release() {
         previous_release_prn: Some(expected_previous_release_prn.to_string()),
         required: expected_required,
         schedule_date: expected_schedule_date.to_string(),
+        version: Some(expected_version.to_string()),
+        version_requirement: Some(expected_version_requirement.to_string()),
     };
 
     match api.releases().create(params).await.unwrap() {
@@ -69,6 +73,11 @@ async fn create_release() {
                 release.release.schedule_date,
                 expected_schedule_date.to_string()
             );
+            assert_eq!(release.release.version, Some(expected_version.to_string()));
+            assert_eq!(
+                release.release.version_requirement,
+                Some(expected_version_requirement.to_string())
+            );
         }
         _ => panic!(),
     }
@@ -88,6 +97,8 @@ async fn get_release() {
     let expected_phase_value = 1.0;
     let expected_required = true;
     let expected_schedule_date = "2000-01-01T00:00:00Z";
+    let expected_version = "1.0.0";
+    let expected_version_requirement = "= 1.0.0";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -128,6 +139,11 @@ async fn get_release() {
                 release.release.schedule_date,
                 expected_schedule_date.to_string()
             );
+            assert_eq!(release.release.version, Some(expected_version.to_string()));
+            assert_eq!(
+                release.release.version_requirement,
+                Some(expected_version_requirement.to_string())
+            );
         }
         _ => panic!(),
     }
@@ -147,6 +163,8 @@ async fn update_release() {
     let expected_phase_value = 0.5;
     let expected_required = false;
     let expected_schedule_date = "2001-01-01T00:00:00Z";
+    let expected_version = "1.0.1";
+    let expected_version_requirement = "= 1.0.1";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -167,6 +185,8 @@ async fn update_release() {
         phase_value: Some(expected_phase_value),
         required: Some(expected_required),
         schedule_date: Some(expected_schedule_date.to_string()),
+        version: Some(expected_version.to_string()),
+        version_requirement: Some(expected_version_requirement.to_string()),
     };
 
     match api.releases().update(params).await.unwrap() {
@@ -191,6 +211,11 @@ async fn update_release() {
             assert_eq!(
                 release.release.schedule_date,
                 expected_schedule_date.to_string()
+            );
+            assert_eq!(release.release.version, Some(expected_version.to_string()));
+            assert_eq!(
+                release.release.version_requirement,
+                Some(expected_version_requirement.to_string())
             );
         }
         _ => panic!(),

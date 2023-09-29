@@ -15,7 +15,9 @@
         "schedule_date": "2000-01-01T00:00:00Z",
         "schedule_complete": true,
         "prn": "prn",
-        "updated_at": "2000-01-01T00:00:00Z"
+        "updated_at": "2000-01-01T00:00:00Z",
+        "version": "1.0.0",
+        "version_requirement": "= 1.0.0"
     }
 
 }
