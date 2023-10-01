@@ -22,6 +22,8 @@ pub struct Release {
     pub schedule_complete: bool,
     pub prn: String,
     pub updated_at: String,
+    pub version: Option<String>,
+    pub version_requirement: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -40,6 +42,8 @@ pub struct CreateReleaseParams {
     pub previous_release_prn: Option<String>,
     pub required: bool,
     pub schedule_date: String,
+    pub version: Option<String>,
+    pub version_requirement: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -89,6 +93,12 @@ pub struct UpdateReleaseParams {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub schedule_date: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub version: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub version_requirement: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
