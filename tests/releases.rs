@@ -61,7 +61,7 @@ async fn create_release() {
             assert_eq!(release.release.name, expected_name.to_string());
             assert_eq!(
                 release.release.next_release_prn,
-                expected_next_release_prn.to_string()
+                Some(expected_next_release_prn.to_string())
             );
             assert_eq!(
                 release.release.organization_prn,
@@ -127,7 +127,7 @@ async fn get_release() {
             assert_eq!(release.release.name, expected_name.to_string());
             assert_eq!(
                 release.release.next_release_prn,
-                expected_next_release_prn.to_string()
+                Some(expected_next_release_prn.to_string())
             );
             assert_eq!(
                 release.release.organization_prn,
@@ -200,7 +200,7 @@ async fn update_release() {
             assert_eq!(release.release.name, expected_name.to_string());
             assert_eq!(
                 release.release.next_release_prn,
-                expected_next_release_prn.to_string()
+                Some(expected_next_release_prn.to_string())
             );
             assert_eq!(
                 release.release.organization_prn,

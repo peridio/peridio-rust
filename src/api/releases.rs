@@ -13,7 +13,7 @@ pub struct Release {
     pub description: Option<String>,
     pub inserted_at: String,
     pub name: String,
-    pub next_release_prn: String,
+    pub next_release_prn: Option<String>,
     pub organization_prn: String,
     pub phase_type: String,
     pub phase_value: f64,
