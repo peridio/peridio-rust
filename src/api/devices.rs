@@ -17,6 +17,7 @@ pub struct Device {
     pub tags: Option<Vec<String>>,
     pub version: String,
     pub target: Option<String>,
+    pub cohort_prn: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Eq, PartialEq)]
@@ -75,6 +76,9 @@ pub struct CreateDeviceParams {
     pub last_communication: Option<String>,
     pub tags: Option<Vec<String>>,
     pub target: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub cohort_prn: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

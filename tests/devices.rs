@@ -22,6 +22,7 @@ async fn create_device() {
     let expected_last_communication = "date";
     let expected_tags = vec!["tag-1".to_string(), "tag-2".to_string()];
     let expected_target = "test-target";
+    let expected_cohort_prn = "a";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -47,6 +48,7 @@ async fn create_device() {
         last_communication: Some(expected_last_communication.to_string()),
         tags: Some(expected_tags),
         target: Some(expected_target.to_string()),
+        cohort_prn: Some(expected_cohort_prn.to_string()),
     };
 
     match api.devices().create(params).await.unwrap() {
