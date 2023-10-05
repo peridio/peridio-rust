@@ -182,6 +182,7 @@ async fn update_release() {
         prn: expected_prn.to_string(),
         description: Some(expected_description.to_string()),
         name: Some(expected_name.to_string()),
+        next_release_prn: Some(expected_next_release_prn.to_string()),
         phase_value: Some(expected_phase_value),
         required: Some(expected_required),
         schedule_date: Some(expected_schedule_date.to_string()),
