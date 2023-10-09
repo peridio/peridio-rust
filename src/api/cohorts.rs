@@ -7,7 +7,6 @@ use super::Error;
 use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize)]
-
 pub struct Cohort {
     pub description: Option<String>,
     pub name: String,
