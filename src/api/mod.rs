@@ -16,6 +16,7 @@ pub mod firmwares;
 pub mod organization_users;
 pub mod product_users;
 pub mod products;
+pub mod products_v2;
 pub mod releases;
 pub mod signing_keys;
 
@@ -44,6 +45,7 @@ pub use firmwares::FirmwaresApi;
 pub use organization_users::OrganizationUsersApi;
 pub use product_users::ProductUsersApi;
 pub use products::ProductApi;
+pub use products_v2::ProductsV2Api;
 pub use releases::ReleasesApi;
 pub use reqwest::Body;
 pub use signing_keys::SigningKeysApi;
@@ -353,6 +355,10 @@ impl Api {
 
     pub fn products(&self) -> ProductApi {
         ProductApi(self)
+    }
+
+    pub fn products_v2(&self) -> ProductsV2Api {
+        ProductsV2Api(self)
     }
 
     pub fn product_users(&self) -> ProductUsersApi {
