@@ -17,6 +17,9 @@ pub struct ProductV2 {
 
 #[derive(Debug, Serialize)]
 pub struct CreateProductV2Params {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub archived: Option<bool>,
     pub name: String,
     pub organization_prn: String,
 }
@@ -65,13 +68,6 @@ pub struct UpdateProductV2Params {
 pub struct UpdateProductV2Response {
     pub product: ProductV2,
 }
-
-pub struct DeleteProductV2Params {
-    pub product_prn: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct DeleteProductV2Response {}
 
 pub struct ProductsV2Api<'a>(pub &'a Api);
 
@@ -129,16 +125,6 @@ impl<'a> ProductsV2Api<'a> {
                 format!("/products/{product_prn}"),
                 Some(json_body!(&params)),
             )
-            .await
-    }
-
-    pub async fn delete(
-        &'a self,
-        params: DeleteProductV2Params,
-    ) -> Result<Option<DeleteProductV2Response>, Error> {
-        let product_prn: String = params.product_prn;
-        self.0
-            .execute(Method::DELETE, format!("/products/{product_prn}"), None)
             .await
     }
 }
