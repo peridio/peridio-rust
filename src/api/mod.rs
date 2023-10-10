@@ -247,7 +247,23 @@ impl Api {
         P: AsRef<str> + Display,
         T: DeserializeOwned,
     {
-        self.execute_with_headers(method, path, body, vec![]).await
+        self.execute_with_params_and_headers(method, path, body, vec![], vec![])
+            .await
+    }
+
+    async fn execute_with_params<P, T>(
+        &self,
+        method: Method,
+        path: P,
+        body: Option<BodyType>,
+        params: Vec<(String, String)>,
+    ) -> Result<Option<T>, Error>
+    where
+        P: AsRef<str> + Display,
+        T: DeserializeOwned,
+    {
+        self.execute_with_params_and_headers(method, path, body, params, vec![])
+            .await
     }
 
     async fn execute_with_headers<P, T>(
@@ -255,6 +271,22 @@ impl Api {
         method: Method,
         path: P,
         body: Option<BodyType>,
+        headers: Vec<(String, String)>,
+    ) -> Result<Option<T>, Error>
+    where
+        P: AsRef<str> + Display,
+        T: DeserializeOwned,
+    {
+        self.execute_with_params_and_headers(method, path, body, vec![], headers)
+            .await
+    }
+
+    async fn execute_with_params_and_headers<P, T>(
+        &self,
+        method: Method,
+        path: P,
+        body: Option<BodyType>,
+        params: Vec<(String, String)>,
         headers: Vec<(String, String)>,
     ) -> Result<Option<T>, Error>
     where
@@ -273,6 +305,7 @@ impl Api {
         let req_builder = self
             .http
             .request(method.clone(), endpoint)
+            .query(&params)
             .header("Authorization", format!("Token {}", &self.api_key))
             .headers(hmap);
 
