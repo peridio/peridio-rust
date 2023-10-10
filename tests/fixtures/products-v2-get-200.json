@@ -1,8 +1,8 @@
 {
   "product": {
+    "archived": false,
     "inserted_at": "2000-01-01T00:00:00Z",
     "name": "name",
-    "organization_prn": "organization_prn",
     "prn": "prn",
     "updated_at": "2000-01-01T00:00:00Z"
   }

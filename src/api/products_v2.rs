@@ -8,9 +8,9 @@ use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProductV2 {
+    pub archived: bool,
     pub inserted_at: String,
     pub name: String,
-    pub organization_prn: String,
     pub prn: String,
     pub updated_at: String,
 }
@@ -56,6 +56,9 @@ pub struct UpdateProductV2Params {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub archived: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -96,13 +99,21 @@ impl<'a> ProductsV2Api<'a> {
         &'a self,
         params: ListProductsV2Params,
     ) -> Result<Option<ListProductsV2Response>, Error> {
-        let search_string = params.search;
+        let mut query_params = vec![("search".to_string(), params.search)];
+
+        if let Some(limit) = params.limit {
+            query_params.push(("limit".to_string(), limit.to_string()))
+        }
+        if let Some(order) = params.order {
+            query_params.push(("order".to_string(), order))
+        }
+
+        if let Some(page) = params.page {
+            query_params.push(("page".to_string(), page))
+        }
+
         self.0
-            .execute(
-                Method::GET,
-                format!("/products?search={search_string}"),
-                None,
-            )
+            .execute_with_params(Method::GET, "/products".to_string(), None, query_params)
             .await
     }
 

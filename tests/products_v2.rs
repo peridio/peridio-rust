@@ -33,10 +33,6 @@ async fn create_product() {
     match api.products_v2().create(params).await.unwrap() {
         Some(product) => {
             assert_eq!(product.product.name, expected_name.to_string());
-            assert_eq!(
-                product.product.organization_prn,
-                expected_organization_prn.to_string()
-            );
         }
         _ => panic!(),
     }
@@ -47,7 +43,6 @@ async fn create_product() {
 #[tokio::test]
 async fn get_product() {
     let expected_name = "name";
-    let expected_organization_prn = "organization_prn";
     let expected_prn = "prn";
 
     let api = Api::new(ApiOptions {
@@ -69,10 +64,6 @@ async fn get_product() {
     match api.products_v2().get(params).await.unwrap() {
         Some(product) => {
             assert_eq!(product.product.name, expected_name.to_string());
-            assert_eq!(
-                product.product.organization_prn,
-                expected_organization_prn.to_string()
-            );
         }
         _ => panic!(),
     }
@@ -82,8 +73,8 @@ async fn get_product() {
 
 #[tokio::test]
 async fn update_product() {
+    let expected_archived = true;
     let expected_name = "name";
-    let expected_organization_prn = "organization_prn";
     let expected_prn = "prn";
 
     let api = Api::new(ApiOptions {
@@ -101,15 +92,13 @@ async fn update_product() {
     let params = UpdateProductV2Params {
         prn: expected_prn.to_string(),
         name: Some(expected_name.to_string()),
+        archived: Some(true),
     };
 
     match api.products_v2().update(params).await.unwrap() {
         Some(product) => {
             assert_eq!(product.product.name, expected_name.to_string());
-            assert_eq!(
-                product.product.organization_prn,
-                expected_organization_prn.to_string()
-            );
+            assert_eq!(product.product.archived, expected_archived);
         }
         _ => panic!(),
     }
