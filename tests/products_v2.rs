@@ -26,6 +26,7 @@ async fn create_product() {
         .create();
 
     let params = CreateProductV2Params {
+        archived: None,
         name: expected_name.to_string(),
         organization_prn: expected_organization_prn.to_string(),
     };
@@ -33,6 +34,7 @@ async fn create_product() {
     match api.products_v2().create(params).await.unwrap() {
         Some(product) => {
             assert_eq!(product.product.name, expected_name.to_string());
+            assert_eq!(product.product.archived, false);
         }
         _ => panic!(),
     }
