@@ -12,6 +12,7 @@ pub mod deployments;
 pub mod device_certificates;
 pub mod devices;
 pub mod error;
+pub mod events;
 pub mod firmwares;
 pub mod organization_users;
 pub mod product_users;
@@ -19,6 +20,7 @@ pub mod products;
 pub mod products_v2;
 pub mod releases;
 pub mod signing_keys;
+pub mod webhooks;
 
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use reqwest::{header, Client, ClientBuilder, Method};
@@ -50,6 +52,7 @@ pub use releases::ReleasesApi;
 pub use reqwest::Body;
 pub use signing_keys::SigningKeysApi;
 pub use users::UsersApi;
+pub use webhooks::WebhooksApi;
 
 use self::artifact_versions::ArtifactVersionsApi;
 use self::bundles::BundlesApi;
@@ -408,5 +411,9 @@ impl Api {
 
     pub fn users(&self) -> UsersApi {
         UsersApi(self)
+    }
+
+    pub fn webhooks(&self) -> WebhooksApi {
+        WebhooksApi(self)
     }
 }

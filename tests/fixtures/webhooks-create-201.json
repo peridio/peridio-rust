@@ -1,0 +1,14 @@
+{
+  "webhook": {
+    "description": "description",
+    "inserted_at": "date1",
+    "organization_prn": "string",
+    "prn": "string",
+    "state": "disabled",
+    "url": "https://peridio.com",
+    "enabled_events": [
+      "device.release_changed"
+    ],
+    "updated_at": "date2"
+  }
+}
