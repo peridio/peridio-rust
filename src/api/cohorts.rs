@@ -96,13 +96,20 @@ impl<'a> CohortsApi<'a> {
         &'a self,
         params: ListCohortsParams,
     ) -> Result<Option<ListCohortsResponse>, Error> {
-        let search_string = params.search;
+        let mut query_params = vec![("search".to_string(), params.search)];
+
+        if let Some(limit) = params.limit {
+            query_params.push(("limit".to_string(), limit.to_string()))
+        }
+        if let Some(order) = params.order {
+            query_params.push(("order".to_string(), order))
+        }
+
+        if let Some(page) = params.page {
+            query_params.push(("page".to_string(), page))
+        }
         self.0
-            .execute(
-                Method::GET,
-                format!("/cohorts?search={search_string}"),
-                None,
-            )
+            .execute_with_params(Method::GET, "/cohorts".to_string(), None, query_params)
             .await
     }
 

@@ -100,12 +100,24 @@ impl<'a> ArtifactVersionsApi<'a> {
         &'a self,
         params: ListArtifactVersionsParams,
     ) -> Result<Option<ListArtifactVersionsResponse>, Error> {
-        let search_string = params.search;
+        let mut query_params = vec![("search".to_string(), params.search)];
+
+        if let Some(limit) = params.limit {
+            query_params.push(("limit".to_string(), limit.to_string()))
+        }
+        if let Some(order) = params.order {
+            query_params.push(("order".to_string(), order))
+        }
+
+        if let Some(page) = params.page {
+            query_params.push(("page".to_string(), page))
+        }
         self.0
-            .execute(
+            .execute_with_params(
                 Method::GET,
-                format!("/artifact_versions?search={search_string}"),
+                "/artifact_versions".to_string(),
                 None,
+                query_params,
             )
             .await
     }
