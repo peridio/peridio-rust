@@ -34,7 +34,7 @@ async fn create_product() {
     match api.products_v2().create(params).await.unwrap() {
         Some(product) => {
             assert_eq!(product.product.name, expected_name.to_string());
-            assert_eq!(product.product.archived, false);
+            assert!(!product.product.archived);
         }
         _ => panic!(),
     }

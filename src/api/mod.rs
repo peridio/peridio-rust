@@ -84,6 +84,12 @@ pub enum Error {
     #[snafu(display("JSON serialization failed {}", source))]
     JsonSerializationFailed { source: serde_json::Error },
 
+    #[snafu(display("Error decoding API response: {} \r\n{}", source, text_response))]
+    JsonDeserializationFailure {
+        source: serde_json::Error,
+        text_response: String,
+    },
+
     #[snafu(display("{}", error))]
     Unknown { error: String },
 
@@ -328,7 +334,15 @@ impl Api {
             .context(RequestFailed)?;
 
         match res.status().as_u16() {
-            200..=201 => Ok(Some(res.json().await.context(BadResponse)?)),
+            200..=201 => {
+                let response_body = res.text().await.context(BadResponse)?;
+
+                let res =
+                    serde_json::from_str(&response_body).context(JsonDeserializationFailure {
+                        text_response: response_body,
+                    })?;
+                Ok(Some(res))
+            }
             204 => Ok(None),
             _ => {
                 let response = res.text().await.context(BadResponse)?;
