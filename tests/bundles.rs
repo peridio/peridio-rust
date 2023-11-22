@@ -3,7 +3,7 @@ mod common;
 use common::API_KEY;
 use mockito::{mock, server_url as mock_server_url};
 
-use peridio_sdk::api::bundles::{BundleArtifactVersion, CreateBundleParams, GetBundleParams};
+use peridio_sdk::api::bundles::{CreateBundleParams, GetBundleParams};
 
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
@@ -12,15 +12,10 @@ use peridio_sdk::api::ApiOptions;
 async fn create_bundle() {
     let expected_organization_prn = "organization_prn";
     let expected_artifact_versions = [
-        BundleArtifactVersion {
-            prn: "artifact_version_prn_1".to_string(),
-            index: 0,
-        },
-        BundleArtifactVersion {
-            prn: "artifact_version_prn_2".to_string(),
-            index: 1,
-        },
-    ];
+        "artifact_version_prn_1".to_string(),
+        "artifact_version_prn_2".to_string(),
+    ]
+    .to_vec();
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -36,10 +31,7 @@ async fn create_bundle() {
 
     let params = CreateBundleParams {
         organization_prn: expected_organization_prn.to_string(),
-        artifact_version_prns: expected_artifact_versions
-            .iter()
-            .map(|artifact| artifact.prn.clone())
-            .collect(),
+        artifact_version_prns: expected_artifact_versions.clone(),
     };
 
     match api.bundles().create(params).await.unwrap() {
@@ -62,15 +54,10 @@ async fn get_bundle() {
     let expected_prn = "prn";
     let expected_organization_prn = "organization_prn";
     let expected_artifact_versions = [
-        BundleArtifactVersion {
-            prn: "artifact_version_prn_1".to_string(),
-            index: 0,
-        },
-        BundleArtifactVersion {
-            prn: "artifact_version_prn_2".to_string(),
-            index: 1,
-        },
-    ];
+        "artifact_version_prn_1".to_string(),
+        "artifact_version_prn_2".to_string(),
+    ]
+    .to_vec();
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
