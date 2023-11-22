@@ -8,17 +8,11 @@ use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Bundle {
-    pub artifact_versions: Vec<BundleArtifactVersion>,
+    pub artifact_versions: Vec<String>,
     pub inserted_at: String,
     pub organization_prn: String,
     pub prn: String,
     pub updated_at: String,
-}
-
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
-pub struct BundleArtifactVersion {
-    pub prn: String,
-    pub index: u16,
 }
 
 #[derive(Debug, Serialize)]
