@@ -1,0 +1,15 @@
+{
+  "binary": {
+    "artifact_version_prn": "artifact_version_prn",
+    "description": "description",
+    "hash": "hash",
+    "organization_prn": "organization_prn",
+    "prn": "prn",
+    "inserted_at": "2000-01-01T00:00:00Z",
+    "revision": 0,
+    "size": 10,
+    "state": "uploadable",
+    "target": "target",
+    "updated_at": "2000-01-01T00:00:00Z"
+  }
+}

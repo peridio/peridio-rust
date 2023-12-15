@@ -50,6 +50,7 @@ pub struct Binary {
     pub organization_prn: String,
     pub prn: String,
     pub inserted_at: String,
+    pub revision: u32,
     pub signatures: Option<Vec<BinarySignature>>,
     pub size: Option<u64>,
     pub state: BinaryState,
