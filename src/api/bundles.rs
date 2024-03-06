@@ -13,12 +13,14 @@ pub struct Bundle {
     pub organization_prn: String,
     pub prn: String,
     pub updated_at: String,
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct CreateBundleParams {
     pub artifact_version_prns: Vec<String>,
     pub organization_prn: String,
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -48,6 +50,19 @@ pub struct ListBundlesParams {
 pub struct ListBundlesResponse {
     pub bundles: Vec<Bundle>,
     pub next_page: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct UpdateBundleParams {
+    pub prn: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub name: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct UpdateBundleResponse {
+    pub bundle: Bundle,
 }
 
 pub struct BundlesApi<'a>(pub &'a Api);
@@ -90,6 +105,21 @@ impl<'a> BundlesApi<'a> {
         }
         self.0
             .execute_with_params(Method::GET, "/bundles".to_string(), None, query_params)
+            .await
+    }
+
+    pub async fn update(
+        &'a self,
+        params: UpdateBundleParams,
+    ) -> Result<Option<UpdateBundleResponse>, Error> {
+        let bundle_prn: &String = &params.prn;
+
+        self.0
+            .execute(
+                Method::PATCH,
+                format!("/bundles/{bundle_prn}"),
+                Some(json_body!(&params)),
+            )
             .await
     }
 }

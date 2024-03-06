@@ -3,7 +3,7 @@ mod common;
 use common::API_KEY;
 use mockito::{mock, server_url as mock_server_url};
 
-use peridio_sdk::api::bundles::{CreateBundleParams, GetBundleParams};
+use peridio_sdk::api::bundles::{CreateBundleParams, GetBundleParams, UpdateBundleParams};
 
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
@@ -16,6 +16,7 @@ async fn create_bundle() {
         "artifact_version_prn_2".to_string(),
     ]
     .to_vec();
+    let expected_name = "a";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -23,7 +24,7 @@ async fn create_bundle() {
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*format!("/bundles"))
+    let m = mock("POST", "/bundles")
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/bundles-create-201.json")
@@ -32,6 +33,7 @@ async fn create_bundle() {
     let params = CreateBundleParams {
         organization_prn: expected_organization_prn.to_string(),
         artifact_version_prns: expected_artifact_versions.clone(),
+        name: Some(expected_name.to_string()),
     };
 
     match api.bundles().create(params).await.unwrap() {
@@ -83,6 +85,38 @@ async fn get_bundle() {
             );
 
             assert_eq!(bundle.bundle.artifact_versions, expected_artifact_versions);
+        }
+        _ => panic!(),
+    }
+
+    m.assert();
+}
+
+#[tokio::test]
+async fn update_bundle() {
+    let expected_name = "b";
+    let expected_prn = "1";
+
+    let api = Api::new(ApiOptions {
+        api_key: API_KEY.into(),
+        endpoint: Some(mock_server_url()),
+        ca_bundle_path: None,
+    });
+
+    let m = mock("PATCH", &*format!("/bundles/{expected_prn}"))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/bundles-update-200.json")
+        .create();
+
+    let params = UpdateBundleParams {
+        prn: expected_prn.to_string(),
+        name: Some(expected_name.to_string()),
+    };
+
+    match api.bundles().update(params).await.unwrap() {
+        Some(response) => {
+            assert_eq!(response.bundle.name, Some(expected_name.to_string()));
         }
         _ => panic!(),
     }
