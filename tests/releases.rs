@@ -42,7 +42,9 @@ async fn create_release() {
         name: expected_name.to_string(),
         next_release_prn: Some(expected_next_release_prn.to_string()),
         organization_prn: expected_organization_prn.to_string(),
-        phase_value: expected_phase_value,
+        phase_mode: None,
+        phase_tags: None,
+        phase_value: expected_phase_value.into(),
         previous_release_prn: Some(expected_previous_release_prn.to_string()),
         required: expected_required,
         schedule_date: expected_schedule_date.to_string(),
@@ -67,7 +69,7 @@ async fn create_release() {
                 release.release.organization_prn,
                 expected_organization_prn.to_string()
             );
-            assert_eq!(release.release.phase_value, expected_phase_value);
+            assert_eq!(release.release.phase_value, Some(expected_phase_value));
             assert_eq!(release.release.required, expected_required);
             assert_eq!(
                 release.release.schedule_date,
@@ -133,7 +135,7 @@ async fn get_release() {
                 release.release.organization_prn,
                 expected_organization_prn.to_string()
             );
-            assert_eq!(release.release.phase_value, expected_phase_value);
+            assert_eq!(release.release.phase_value, Some(expected_phase_value));
             assert_eq!(release.release.required, expected_required);
             assert_eq!(
                 release.release.schedule_date,
@@ -183,6 +185,8 @@ async fn update_release() {
         description: Some(expected_description.to_string()),
         name: Some(expected_name.to_string()),
         next_release_prn: Some(expected_next_release_prn.to_string()),
+        phase_mode: None,
+        phase_tags: None,
         phase_value: Some(expected_phase_value),
         required: Some(expected_required),
         schedule_date: Some(expected_schedule_date.to_string()),
@@ -207,7 +211,7 @@ async fn update_release() {
                 release.release.organization_prn,
                 expected_organization_prn.to_string()
             );
-            assert_eq!(release.release.phase_value, expected_phase_value);
+            assert_eq!(release.release.phase_value, Some(expected_phase_value));
             assert_eq!(release.release.required, expected_required);
             assert_eq!(
                 release.release.schedule_date,

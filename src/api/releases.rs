@@ -15,8 +15,10 @@ pub struct Release {
     pub name: String,
     pub next_release_prn: Option<String>,
     pub organization_prn: String,
-    pub phase_type: String,
-    pub phase_value: f64,
+    pub phase_mode: Option<String>,
+    pub phase_tags: Option<Vec<String>>,
+    pub phase_type: Option<String>,
+    pub phase_value: Option<f64>,
     pub required: bool,
     pub schedule_date: String,
     pub schedule_complete: bool,
@@ -36,7 +38,15 @@ pub struct CreateReleaseParams {
     #[serde(default)]
     pub next_release_prn: Option<String>,
     pub organization_prn: String,
-    pub phase_value: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub phase_mode: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub phase_tags: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub phase_value: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub previous_release_prn: Option<String>,
@@ -87,6 +97,12 @@ pub struct UpdateReleaseParams {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub next_release_prn: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub phase_mode: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub phase_tags: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub phase_value: Option<f64>,
