@@ -22,7 +22,8 @@
         "tag-1",
         "tag-2"
       ],
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "prn": "prn"
     },
     {
       "description": "test-2",
@@ -46,7 +47,8 @@
         "tag-3",
         "tag-4"
       ],
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "prn": "prn"
     }
   ]
 }

@@ -13,6 +13,7 @@ pub struct Device {
     pub healthy: Option<bool>,
     pub identifier: String,
     pub last_communication: String,
+    pub prn: String,
     pub status: String,
     pub tags: Option<Vec<String>>,
     pub version: String,
