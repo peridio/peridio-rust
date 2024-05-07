@@ -11,6 +11,7 @@ pub struct Release {
     pub bundle_prn: String,
     pub cohort_prn: String,
     pub description: Option<String>,
+    pub disabled: Option<bool>,
     pub inserted_at: String,
     pub name: String,
     pub next_release_prn: Option<String>,
@@ -33,6 +34,7 @@ pub struct CreateReleaseParams {
     pub bundle_prn: String,
     pub cohort_prn: String,
     pub description: Option<String>,
+    pub disabled: Option<bool>,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -91,6 +93,9 @@ pub struct UpdateReleaseParams {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub disabled: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub name: Option<String>,

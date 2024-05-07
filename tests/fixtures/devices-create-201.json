@@ -10,6 +10,7 @@
         ],
         "status": "offline",
         "version": "1.0.0",
-        "target": "test-target"
+        "target": "test-target",
+        "prn": "prn"
     }
 }

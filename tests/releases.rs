@@ -29,7 +29,7 @@ async fn create_release() {
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*format!("/releases"))
+    let m = mock("POST", &*"/releases".to_string())
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/releases-create-201.json")
@@ -39,6 +39,7 @@ async fn create_release() {
         bundle_prn: expected_bundle_prn.to_string(),
         cohort_prn: expected_cohort_prn.to_string(),
         description: Some(expected_description.to_string()),
+        disabled: None,
         name: expected_name.to_string(),
         next_release_prn: Some(expected_next_release_prn.to_string()),
         organization_prn: expected_organization_prn.to_string(),
@@ -183,6 +184,7 @@ async fn update_release() {
     let params = UpdateReleaseParams {
         prn: expected_prn.to_string(),
         description: Some(expected_description.to_string()),
+        disabled: None,
         name: Some(expected_name.to_string()),
         next_release_prn: Some(expected_next_release_prn.to_string()),
         phase_mode: None,
