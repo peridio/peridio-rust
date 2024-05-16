@@ -20,6 +20,7 @@ pub mod products;
 pub mod products_v2;
 pub mod releases;
 pub mod signing_keys;
+pub mod tunnels;
 pub mod webhooks;
 
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
@@ -51,6 +52,7 @@ pub use products_v2::ProductsV2Api;
 pub use releases::ReleasesApi;
 pub use reqwest::Body;
 pub use signing_keys::SigningKeysApi;
+pub use tunnels::TunnelsApi;
 pub use users::UsersApi;
 pub use webhooks::WebhooksApi;
 
@@ -421,6 +423,10 @@ impl Api {
 
     pub fn signing_keys(&self) -> SigningKeysApi {
         SigningKeysApi(self)
+    }
+
+    pub fn tunnels(&self) -> TunnelsApi {
+        TunnelsApi(self)
     }
 
     pub fn users(&self) -> UsersApi {
