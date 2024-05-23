@@ -8,18 +8,20 @@ use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Tunnel {
-    pub cidr_block_allowlist: Vec<String>,
-    pub device_proxy_ip_address: String,
-    pub device_proxy_port: u16,
-    pub device_public_key: String,
+    pub cidr_block_allowlist: Option<Vec<String>>,
+    pub device_prn: String,
+    pub device_proxy_ip_address: Option<String>,
+    pub device_proxy_port: Option<u16>,
+    pub device_public_key: Option<String>,
     pub device_tunnel_port: u16,
     pub expires_at: String,
     pub inserted_at: String,
+    pub organization_prn: String,
     pub prn: String,
-    pub server_proxy_ip_address: String,
-    pub server_proxy_port: u16,
-    pub server_public_key: String,
-    pub server_tunnel_port: u16,
+    pub server_proxy_ip_address: Option<String>,
+    pub server_proxy_port: Option<u16>,
+    pub server_public_key: Option<String>,
+    pub server_tunnel_port: Option<u16>,
     pub state: String,
     pub updated_at: String,
 }
