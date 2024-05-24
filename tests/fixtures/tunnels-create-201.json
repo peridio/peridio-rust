@@ -1,12 +1,14 @@
 {
   "tunnel": {
     "cidr_block_allowlist": ["10.0.0.1/32"],
+    "device_prn": "device_prn",
     "device_proxy_ip_address": "10.0.1.1",
     "device_proxy_port": 47539,
     "device_public_key": "device_public_key",
     "device_tunnel_port": 22,
     "expires_at": "2000-01-01T00:00:00Z",
     "inserted_at": "2001-01-01T00:00:00Z",
+    "organization_prn": "organization_prn",
     "prn": "prn",
     "server_proxy_ip_address": "10.0.0.1",
     "server_proxy_port": 49293,

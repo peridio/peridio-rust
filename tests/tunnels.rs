@@ -38,7 +38,10 @@ async fn create_tunnel() {
         Some(tunnel) => {
             assert_eq!(tunnel.tunnel.expires_at, "2000-01-01T00:00:00Z");
             assert_eq!(tunnel.tunnel.device_tunnel_port, port);
-            assert_eq!(tunnel.tunnel.cidr_block_allowlist, cidr_block_allowlist);
+            assert_eq!(
+                tunnel.tunnel.cidr_block_allowlist,
+                Some(cidr_block_allowlist)
+            );
         }
         _ => panic!(),
     }
