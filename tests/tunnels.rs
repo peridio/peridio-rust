@@ -39,6 +39,10 @@ async fn create_tunnel() {
             assert_eq!(tunnel.tunnel.expires_at, "2000-01-01T00:00:00Z");
             assert_eq!(tunnel.tunnel.device_tunnel_port, port);
             assert_eq!(
+                tunnel.tunnel.server_tunnel_ip_address,
+                Some("3.82.23.99".to_owned())
+            );
+            assert_eq!(
                 tunnel.tunnel.cidr_block_allowlist,
                 Some(cidr_block_allowlist)
             );
@@ -74,6 +78,10 @@ async fn update_tunnel() {
     match api.tunnels().update(params).await.unwrap() {
         Some(tunnel) => {
             assert_eq!(tunnel.tunnel.state, expected_state.to_string());
+            assert_eq!(
+                tunnel.tunnel.server_tunnel_ip_address,
+                Some("3.82.23.99".to_owned())
+            );
         }
         _ => panic!(),
     }
