@@ -21,6 +21,7 @@ pub struct Tunnel {
     pub server_proxy_ip_address: Option<String>,
     pub server_proxy_port: Option<u16>,
     pub server_public_key: Option<String>,
+    pub server_tunnel_ip_address: Option<String>,
     pub server_tunnel_port: Option<u16>,
     pub state: String,
     pub updated_at: String,
