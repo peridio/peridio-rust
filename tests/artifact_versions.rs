@@ -9,10 +9,12 @@ use peridio_sdk::api::artifact_versions::{
 
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
+use serde_json::json;
 
 #[tokio::test]
 async fn create_artifact_version() {
     let expected_artifact_prn = "artifact_prn";
+    let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "description";
     let expected_version = "v0.0.1";
 
@@ -30,12 +32,17 @@ async fn create_artifact_version() {
 
     let params = CreateArtifactVersionParams {
         artifact_prn: expected_artifact_prn.to_string(),
+        custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
         version: expected_version.to_string(),
     };
 
     match api.artifact_versions().create(params).await.unwrap() {
         Some(artifact_version) => {
+            assert_eq!(
+                artifact_version.artifact_version.custom_metadata,
+                Some(expected_custom_metadata.as_object().unwrap().clone())
+            );
             assert_eq!(
                 artifact_version.artifact_version.description,
                 Some(expected_description.to_string())
@@ -102,6 +109,7 @@ async fn get_artifact_version() {
 #[tokio::test]
 async fn update_artifact() {
     let expected_prn = "prn";
+    let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "updated_description";
 
     let api = Api::new(ApiOptions {
@@ -118,11 +126,16 @@ async fn update_artifact() {
 
     let params = UpdateArtifactVersionParams {
         prn: expected_prn.to_string(),
+        custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
     };
 
     match api.artifact_versions().update(params).await.unwrap() {
         Some(artifact_version) => {
+            assert_eq!(
+                artifact_version.artifact_version.custom_metadata,
+                Some(expected_custom_metadata.as_object().unwrap().clone())
+            );
             assert_eq!(
                 artifact_version.artifact_version.description,
                 Some(expected_description.to_string())

@@ -1,6 +1,7 @@
 {
   "binary": {
     "artifact_version_prn": "artifact_version_prn",
+    "custom_metadata": { "foo": "bar" },
     "description": "description",
     "hash": "hash",
     "organization_prn": "organization_prn",
