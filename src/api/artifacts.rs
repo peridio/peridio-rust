@@ -3,9 +3,11 @@ use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::{json_body, Api};
+use validator::Validate;
 
-use super::Error;
+use crate::{json_body, validators, Api};
+
+use super::{Error, Validation};
 use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -19,8 +21,9 @@ pub struct Artifact {
     pub updated_at: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Validate)]
 pub struct CreateArtifactParams {
+    #[validate(custom(function = "validators::validate_json_length_1mb"))]
     pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub name: String,
@@ -56,11 +59,12 @@ pub struct ListArtifactsResponse {
     pub next_page: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Validate)]
 pub struct UpdateArtifactParams {
     pub prn: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
+    #[validate(custom(function = "validators::validate_json_length_1mb"))]
     pub custom_metadata: Option<Map<String, Value>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -82,9 +86,14 @@ impl<'a> ArtifactsApi<'a> {
         &'a self,
         params: CreateArtifactParams,
     ) -> Result<Option<CreateArtifactResponse>, Error> {
-        self.0
-            .execute(Method::POST, "/artifacts", Some(json_body!(&params)))
-            .await
+        match params.validate().context(Validation) {
+            Ok(()) => {
+                self.0
+                    .execute(Method::POST, "/artifacts", Some(json_body!(&params)))
+                    .await
+            }
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn get(
@@ -124,12 +133,17 @@ impl<'a> ArtifactsApi<'a> {
     ) -> Result<Option<UpdateArtifactResponse>, Error> {
         let artifact_prn: &String = &params.prn;
 
-        self.0
-            .execute(
-                Method::PATCH,
-                format!("/artifacts/{artifact_prn}"),
-                Some(json_body!(&params)),
-            )
-            .await
+        match params.validate().context(Validation) {
+            Ok(()) => {
+                self.0
+                    .execute(
+                        Method::PATCH,
+                        format!("/artifacts/{artifact_prn}"),
+                        Some(json_body!(&params)),
+                    )
+                    .await
+            }
+            Err(err) => Err(err),
+        }
     }
 }

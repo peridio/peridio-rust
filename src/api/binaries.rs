@@ -1,13 +1,13 @@
-use super::Error;
+use super::{Error, Validation};
 
-use crate::json_body;
-use crate::Api;
+use crate::{json_body, validators, Api};
 
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use snafu::ResultExt;
 use std::str::FromStr;
+use validator::Validate;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -61,9 +61,10 @@ pub struct Binary {
     pub updated_at: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Validate)]
 pub struct CreateBinaryParams {
     pub artifact_version_prn: String,
+    #[validate(custom(function = "validators::validate_json_length_1mb"))]
     pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub hash: String,
@@ -100,11 +101,12 @@ pub struct ListBinariesResponse {
     pub next_page: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Validate)]
 pub struct UpdateBinaryParams {
     pub prn: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
+    #[validate(custom(function = "validators::validate_json_length_1mb"))]
     pub custom_metadata: Option<Map<String, Value>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -132,9 +134,14 @@ impl<'a> BinariesApi<'a> {
         &'a self,
         params: CreateBinaryParams,
     ) -> Result<Option<CreateBinaryResponse>, Error> {
-        self.0
-            .execute(Method::POST, "/binaries", Some(json_body!(&params)))
-            .await
+        match params.validate().context(Validation) {
+            Ok(()) => {
+                self.0
+                    .execute(Method::POST, "/binaries", Some(json_body!(&params)))
+                    .await
+            }
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn get(
@@ -174,12 +181,17 @@ impl<'a> BinariesApi<'a> {
     ) -> Result<Option<UpdateBinaryResponse>, Error> {
         let binary_prn: &String = &params.prn;
 
-        self.0
-            .execute(
-                Method::PATCH,
-                format!("/binaries/{binary_prn}"),
-                Some(json_body!(&params)),
-            )
-            .await
+        match params.validate().context(Validation) {
+            Ok(()) => {
+                self.0
+                    .execute(
+                        Method::PATCH,
+                        format!("/binaries/{binary_prn}"),
+                        Some(json_body!(&params)),
+                    )
+                    .await
+            }
+            Err(err) => Err(err),
+        }
     }
 }

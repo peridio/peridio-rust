@@ -60,6 +60,30 @@ async fn create_artifact_version() {
     }
 
     m.assert();
+
+    let expected_custom_metadata = json!({ "foo": "a".repeat(1_048_576 ) });
+
+    let m = mock("POST", &*format!("/artifact_versions"))
+        .with_status(201)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/artifact-versions-create-201.json")
+        .create();
+
+    let params = CreateArtifactVersionParams {
+        artifact_prn: expected_artifact_prn.to_string(),
+        custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
+        description: Some(expected_description.to_string()),
+        version: expected_version.to_string(),
+    };
+
+    match api.artifact_versions().create(params).await {
+        Ok(_artifact_version) => panic!(),
+        Err(err) => assert!(err
+            .to_string()
+            .contains("Validation error: greater than 1MB")),
+    }
+
+    m.expect(0);
 }
 
 #[tokio::test]
@@ -145,4 +169,27 @@ async fn update_artifact() {
     }
 
     m.assert();
+
+    let expected_custom_metadata = json!({ "foo": "a".repeat(1_048_576 ) });
+
+    let m = mock("PATCH", &*format!("/artifact_versions/{expected_prn}"))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/artifact-versions-update-200.json")
+        .create();
+
+    let params = UpdateArtifactVersionParams {
+        prn: expected_prn.to_string(),
+        custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
+        description: Some(expected_description.to_string()),
+    };
+
+    match api.artifact_versions().update(params).await {
+        Ok(_artifact_version) => panic!(),
+        Err(err) => assert!(err
+            .to_string()
+            .contains("Validation error: greater than 1MB")),
+    }
+
+    m.expect(0);
 }

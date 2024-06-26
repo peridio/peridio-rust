@@ -27,13 +27,14 @@ use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use reqwest::{header, Client, ClientBuilder, Method};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use serde_json;
+use serde_json::{self};
 use snafu::{ResultExt, Snafu};
 use std::collections::HashMap;
 use std::fmt::{self, Debug, Display};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
+use validator::ValidationErrors;
 
 pub use artifacts::ArtifactsApi;
 pub use binaries::BinariesApi;
@@ -109,6 +110,9 @@ pub enum Error {
 
     #[snafu(display("{}", error))]
     UnprocessableEntity { error: UnprocessableEntityError },
+
+    #[snafu(display("Validation Errors: {}", source))]
+    Validation { source: ValidationErrors },
 }
 
 #[macro_export]

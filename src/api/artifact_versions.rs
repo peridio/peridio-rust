@@ -3,9 +3,11 @@ use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::{json_body, Api};
+use validator::Validate;
 
-use super::Error;
+use crate::{json_body, validators, Api};
+
+use super::{Error, Validation};
 use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -20,9 +22,10 @@ pub struct ArtifactVersion {
     pub updated_at: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Validate)]
 pub struct CreateArtifactVersionParams {
     pub artifact_prn: String,
+    #[validate(custom(function = "validators::validate_json_length_1mb"))]
     pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub version: String,
@@ -57,11 +60,12 @@ pub struct ListArtifactVersionsResponse {
     pub next_page: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Validate)]
 pub struct UpdateArtifactVersionParams {
     pub prn: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
+    #[validate(custom(function = "validators::validate_json_length_1mb"))]
     pub custom_metadata: Option<Map<String, Value>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -80,13 +84,18 @@ impl<'a> ArtifactVersionsApi<'a> {
         &'a self,
         params: CreateArtifactVersionParams,
     ) -> Result<Option<CreateArtifactVersionResponse>, Error> {
-        self.0
-            .execute(
-                Method::POST,
-                "/artifact_versions",
-                Some(json_body!(&params)),
-            )
-            .await
+        match params.validate().context(Validation) {
+            Ok(()) => {
+                self.0
+                    .execute(
+                        Method::POST,
+                        "/artifact_versions",
+                        Some(json_body!(&params)),
+                    )
+                    .await
+            }
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn get(
@@ -135,12 +144,17 @@ impl<'a> ArtifactVersionsApi<'a> {
     ) -> Result<Option<UpdateArtifactVersionResponse>, Error> {
         let artifact_version_prn: &String = &params.prn;
 
-        self.0
-            .execute(
-                Method::PATCH,
-                format!("/artifact_versions/{artifact_version_prn}"),
-                Some(json_body!(&params)),
-            )
-            .await
+        match params.validate().context(Validation) {
+            Ok(()) => {
+                self.0
+                    .execute(
+                        Method::PATCH,
+                        format!("/artifact_versions/{artifact_version_prn}"),
+                        Some(json_body!(&params)),
+                    )
+                    .await
+            }
+            Err(err) => Err(err),
+        }
     }
 }
