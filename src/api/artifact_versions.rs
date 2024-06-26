@@ -1,5 +1,7 @@
 use reqwest::Method;
+
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 
 use crate::{json_body, Api};
 
@@ -9,6 +11,7 @@ use snafu::ResultExt;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ArtifactVersion {
     pub artifact_prn: String,
+    pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub inserted_at: String,
     pub organization_prn: String,
@@ -20,6 +23,7 @@ pub struct ArtifactVersion {
 #[derive(Debug, Serialize)]
 pub struct CreateArtifactVersionParams {
     pub artifact_prn: String,
+    pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub version: String,
 }
@@ -56,6 +60,9 @@ pub struct ListArtifactVersionsResponse {
 #[derive(Debug, Serialize)]
 pub struct UpdateArtifactVersionParams {
     pub prn: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub custom_metadata: Option<Map<String, Value>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub description: Option<String>,

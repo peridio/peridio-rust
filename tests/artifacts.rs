@@ -7,9 +7,11 @@ use peridio_sdk::api::artifacts::{CreateArtifactParams, GetArtifactParams, Updat
 
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
+use serde_json::json;
 
 #[tokio::test]
 async fn create_artifact() {
+    let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "test";
     let expected_name = "a";
     let expected_organization_prn = "string";
@@ -27,6 +29,7 @@ async fn create_artifact() {
         .create();
 
     let params = CreateArtifactParams {
+        custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
         name: expected_name.to_string(),
         organization_prn: expected_organization_prn.to_string(),
@@ -34,6 +37,10 @@ async fn create_artifact() {
 
     match api.artifacts().create(params).await.unwrap() {
         Some(artifact) => {
+            assert_eq!(
+                artifact.artifact.custom_metadata,
+                Some(expected_custom_metadata.as_object().unwrap().clone())
+            );
             assert_eq!(
                 artifact.artifact.description,
                 Some(expected_description.to_string())
@@ -93,6 +100,7 @@ async fn get_artifact() {
 
 #[tokio::test]
 async fn update_artifact() {
+    let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "test-update";
     let expected_name = "b";
     let expected_organization_prn = "string";
@@ -112,12 +120,17 @@ async fn update_artifact() {
 
     let params = UpdateArtifactParams {
         prn: expected_prn.to_string(),
+        custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
         name: Some(expected_name.to_string()),
     };
 
     match api.artifacts().update(params).await.unwrap() {
         Some(artifact) => {
+            assert_eq!(
+                artifact.artifact.custom_metadata,
+                Some(expected_custom_metadata.as_object().unwrap().clone())
+            );
             assert_eq!(
                 artifact.artifact.description,
                 Some(expected_description.to_string())

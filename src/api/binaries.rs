@@ -1,9 +1,11 @@
 use super::Error;
+
 use crate::json_body;
 use crate::Api;
+
 use reqwest::Method;
-use serde::Deserialize;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 use snafu::ResultExt;
 use std::str::FromStr;
 
@@ -45,6 +47,7 @@ pub struct BinarySignature {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Binary {
     pub artifact_version_prn: String,
+    pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub hash: Option<String>,
     pub organization_prn: String,
@@ -61,6 +64,7 @@ pub struct Binary {
 #[derive(Debug, Serialize)]
 pub struct CreateBinaryParams {
     pub artifact_version_prn: String,
+    pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub hash: String,
     pub size: u64,
@@ -99,6 +103,9 @@ pub struct ListBinariesResponse {
 #[derive(Debug, Serialize)]
 pub struct UpdateBinaryParams {
     pub prn: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub custom_metadata: Option<Map<String, Value>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub description: Option<String>,

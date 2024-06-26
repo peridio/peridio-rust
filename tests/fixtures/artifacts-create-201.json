@@ -1,12 +1,11 @@
 {
-    "artifact": 
-    {
-        "description": "test",
-        "inserted_at": "date1",
-        "name": "a",
-        "organization_prn": "string",
-        "prn": "string",
-        "updated_at": "date2"
-    }
-
+  "artifact": {
+    "custom_metadata": { "foo": "bar" },
+    "description": "test",
+    "inserted_at": "date1",
+    "name": "a",
+    "organization_prn": "string",
+    "prn": "string",
+    "updated_at": "date2"
+  }
 }

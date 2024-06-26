@@ -7,10 +7,12 @@ use peridio_sdk::api::binaries::{CreateBinaryParams, GetBinaryParams};
 
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
+use serde_json::json;
 
 #[tokio::test]
 async fn create_binary() {
     let expected_artifact_version_prn = "artifact_version_prn";
+    let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "description";
     let expected_hash = "hash";
     let expected_organization_prn = "organization_prn";
@@ -31,6 +33,7 @@ async fn create_binary() {
 
     let params = CreateBinaryParams {
         artifact_version_prn: expected_artifact_version_prn.to_string(),
+        custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
         hash: expected_hash.to_string(),
         size: expected_size,
@@ -39,6 +42,10 @@ async fn create_binary() {
 
     match api.binaries().create(params).await.unwrap() {
         Some(binary) => {
+            assert_eq!(
+                binary.binary.custom_metadata,
+                Some(expected_custom_metadata.as_object().unwrap().clone())
+            );
             assert_eq!(
                 binary.binary.artifact_version_prn,
                 expected_artifact_version_prn.to_string()
