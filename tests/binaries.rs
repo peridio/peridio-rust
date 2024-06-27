@@ -10,7 +10,6 @@ use peridio_sdk::api::binaries::{
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
 use serde_json::json;
-use validator::Validate;
 
 #[tokio::test]
 async fn create_binary() {
@@ -70,7 +69,7 @@ async fn create_binary() {
 
     m.assert();
 
-    let expected_custom_metadata = json!({ "foo": "a".repeat(1_048_576 ) });
+    let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
     let m = mock("POST", &*format!("/binaries"))
         .with_status(201)
@@ -206,7 +205,7 @@ async fn update_binary() {
 
     m.assert();
 
-    let expected_custom_metadata = json!({ "foo": "a".repeat(1_048_576 ) });
+    let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
     let m = mock("PATCH", &*format!("/binaries/{expected_prn}"))
         .with_status(200)
