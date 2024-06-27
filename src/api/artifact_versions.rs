@@ -25,7 +25,7 @@ pub struct ArtifactVersion {
 #[derive(Debug, Serialize, Validate)]
 pub struct CreateArtifactVersionParams {
     pub artifact_prn: String,
-    #[validate(custom(function = "validators::validate_json_length_1mb"))]
+    #[validate(custom(function = "validators::validate_json_byte_length_1_000_000"))]
     pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub version: String,
@@ -65,7 +65,7 @@ pub struct UpdateArtifactVersionParams {
     pub prn: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    #[validate(custom(function = "validators::validate_json_length_1mb"))]
+    #[validate(custom(function = "validators::validate_json_byte_length_1_000_000"))]
     pub custom_metadata: Option<Map<String, Value>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]

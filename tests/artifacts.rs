@@ -55,7 +55,7 @@ async fn create_artifact() {
 
     m.assert();
 
-    let expected_custom_metadata = json!({ "foo": "a".repeat(1_048_576 ) });
+    let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
     let m = mock("POST", &*format!("/artifacts"))
         .with_status(201)
@@ -169,7 +169,7 @@ async fn update_artifact() {
 
     m.assert();
 
-    let expected_custom_metadata = json!({ "foo": "a".repeat(1_048_576 ) });
+    let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
     let m = mock("PATCH", &*format!("/artifacts/{expected_prn}"))
         .with_status(200)
