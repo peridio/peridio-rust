@@ -45,6 +45,16 @@ pub struct CreateTunnelResponse {
 }
 
 #[derive(Debug, Serialize)]
+pub struct GetTunnelParams {
+    pub prn: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GetTunnelResponse {
+    pub tunnel: Tunnel,
+}
+
+#[derive(Debug, Serialize)]
 pub struct ListTunnelsParams {
     pub limit: Option<u8>,
     pub order: Option<String>,
@@ -80,6 +90,16 @@ impl<'a> TunnelsApi<'a> {
     ) -> Result<Option<CreateTunnelResponse>, Error> {
         self.0
             .execute(Method::POST, "/tunnels", Some(json_body!(&params)))
+            .await
+    }
+
+    pub async fn get(
+        &'a self,
+        params: GetTunnelParams,
+    ) -> Result<Option<GetTunnelResponse>, Error> {
+        let tunnel_prn: String = params.prn;
+        self.0
+            .execute(Method::GET, format!("/tunnels/{tunnel_prn}"), None)
             .await
     }
 
