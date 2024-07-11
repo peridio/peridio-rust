@@ -21,6 +21,7 @@ async fn create_ca_certificate() {
     let jitp_description = "jitp-test";
     let jitp_product_name = "pro-1";
     let jitp_tags = vec!["tag1".to_string()];
+    let jitp_target: &str = "test-target";
     let jitp_cohort_prn: &str = "test";
 
     let api = Api::new(ApiOptions {
@@ -41,6 +42,7 @@ async fn create_ca_certificate() {
     let jitp = CaCertificateJitp {
         description: jitp_description.to_string(),
         tags: jitp_tags,
+        target: Some(jitp_target.to_string()),
         product_name: jitp_product_name.to_string(),
         cohort_prn: Some(jitp_cohort_prn.to_string()),
     };
@@ -248,6 +250,7 @@ async fn update_ca_certificate() {
     let jitp_description = "jitp-test";
     let jitp_product_name = "pro-1";
     let jitp_tags = vec!["tag1".to_string()];
+    let jitp_target: &str = "test-target";
     let jitp_cohort_prn: &str = "test";
 
     let description = "test-updated";
@@ -270,6 +273,7 @@ async fn update_ca_certificate() {
     let jitp = CaCertificateJitp {
         description: jitp_description.to_string(),
         tags: jitp_tags,
+        target: Some(jitp_target.to_string()),
         product_name: jitp_product_name.to_string(),
         cohort_prn: Some(jitp_cohort_prn.to_string()),
     };

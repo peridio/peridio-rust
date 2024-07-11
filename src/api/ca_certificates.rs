@@ -19,6 +19,7 @@ pub struct CaCertificate {
 pub struct CaCertificateJitp {
     pub description: String,
     pub tags: Vec<String>,
+    pub target: Option<String>,
     pub product_name: String,
     pub cohort_prn: Option<String>,
 }

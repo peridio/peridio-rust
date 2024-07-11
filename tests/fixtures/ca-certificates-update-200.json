@@ -10,6 +10,7 @@
             "tags": [
                 "tag-1"
             ],
+            "target": "test-target",
             "cohort_prn": "test"
         }
     }
