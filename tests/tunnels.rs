@@ -116,6 +116,7 @@ async fn update_tunnel() {
     let params = UpdateTunnelParams {
         prn: expected_prn.to_string(),
         state: Some(expected_state.to_string()),
+        ttl: Some(30),
     };
 
     match api.tunnels().update(params).await.unwrap() {
