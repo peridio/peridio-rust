@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::products::{
     CreateProductParams, DeleteProductParams, GetProductParams, ListProductParams, UpdateProduct,
@@ -13,21 +13,24 @@ use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn create_product() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
 
     let expected_name = "pro-1";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*format!("/orgs/{organization_name}/products"))
+    let m = server
+        .mock("POST", &*format!("/orgs/{organization_name}/products"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/products-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateProductParams {
         name: expected_name.to_string(),
@@ -41,27 +44,30 @@ async fn create_product() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn delete_product() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "DELETE",
-        &*format!("/orgs/{organization_name}/products/{product_name}"),
-    )
-    .with_status(204)
-    .with_body("")
-    .create();
+    let m = server
+        .mock(
+            "DELETE",
+            &*format!("/orgs/{organization_name}/products/{product_name}"),
+        )
+        .with_status(204)
+        .with_body("")
+        .create_async()
+        .await;
 
     let params = DeleteProductParams {
         organization_name: organization_name.to_string(),
@@ -73,11 +79,12 @@ async fn delete_product() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_product() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
 
@@ -85,18 +92,20 @@ async fn get_product() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/products-get-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!("/orgs/{organization_name}/products/{product_name}"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/products-get-200.json")
+        .create_async()
+        .await;
 
     let params = GetProductParams {
         organization_name: organization_name.to_string(),
@@ -110,11 +119,12 @@ async fn get_product() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn list_products() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
 
     let expected_name_0 = "pro-0";
@@ -123,15 +133,17 @@ async fn list_products() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("GET", &*format!("/orgs/{organization_name}/products"))
+    let m = server
+        .mock("GET", &*format!("/orgs/{organization_name}/products"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/products-list-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = ListProductParams {
         organization_name: organization_name.to_string(),
@@ -148,11 +160,12 @@ async fn list_products() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_product() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
 
@@ -160,18 +173,20 @@ async fn update_product() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "PUT",
-        &*format!("/orgs/{organization_name}/products/{product_name}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/products-update-200.json")
-    .create();
+    let m = server
+        .mock(
+            "PUT",
+            &*format!("/orgs/{organization_name}/products/{product_name}"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/products-update-200.json")
+        .create_async()
+        .await;
 
     let params = UpdateProductParams {
         product_name: product_name.to_string(),
@@ -188,5 +203,5 @@ async fn update_product() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

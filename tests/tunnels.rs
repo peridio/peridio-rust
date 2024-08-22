@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::tunnels::{CreateTunnelParams, GetTunnelParams, UpdateTunnelParams};
 
@@ -10,6 +10,7 @@ use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn create_tunnel() {
+    let mut server = Server::new_async().await;
     let cidr_block_allowlist = ["10.0.0.1/32".to_string()].to_vec();
     let device_prn = "device_prn";
     let port = 22;
@@ -17,15 +18,17 @@ async fn create_tunnel() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*format!("/tunnels"))
+    let m = server
+        .mock("POST", &*format!("/tunnels"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/tunnels-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateTunnelParams {
         cidr_block_allowlist: Some(cidr_block_allowlist.clone()),
@@ -50,11 +53,12 @@ async fn create_tunnel() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_tunnel() {
+    let mut server = Server::new_async().await;
     let expected_state = "requested";
     let expected_server_proxy_port = 49293;
     let expected_device_prn = "device_prn";
@@ -63,15 +67,17 @@ async fn get_tunnel() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("GET", &*format!("/tunnels/{expected_prn}"))
+    let m = server
+        .mock("GET", &*format!("/tunnels/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/tunnels-get-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = GetTunnelParams {
         prn: expected_prn.to_string(),
@@ -93,25 +99,28 @@ async fn get_tunnel() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_tunnel() {
+    let mut server = Server::new_async().await;
     let expected_state = "closed";
     let expected_prn = "1";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("PATCH", &*format!("/tunnels/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/tunnels/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/tunnels-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateTunnelParams {
         prn: expected_prn.to_string(),
@@ -130,5 +139,5 @@ async fn update_tunnel() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

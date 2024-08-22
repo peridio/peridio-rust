@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::releases::{CreateReleaseParams, GetReleaseParams, UpdateReleaseParams};
 
@@ -10,6 +10,7 @@ use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn create_release() {
+    let mut server = Server::new_async().await;
     let expected_bundle_prn = "bundle_prn";
     let expected_cohort_prn = "cohort_prn";
     let expected_description = "description";
@@ -25,15 +26,17 @@ async fn create_release() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*"/releases".to_string())
+    let m = server
+        .mock("POST", &*"/releases".to_string())
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/releases-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateReleaseParams {
         bundle_prn: expected_bundle_prn.to_string(),
@@ -85,11 +88,12 @@ async fn create_release() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_release() {
+    let mut server = Server::new_async().await;
     let expected_bundle_prn = "bundle_prn";
     let expected_cohort_prn = "cohort_prn";
     let expected_description = "description";
@@ -105,15 +109,17 @@ async fn get_release() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("GET", &*format!("/releases/{expected_prn}"))
+    let m = server
+        .mock("GET", &*format!("/releases/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/releases-get-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = GetReleaseParams {
         prn: expected_prn.to_string(),
@@ -151,11 +157,12 @@ async fn get_release() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_release() {
+    let mut server = Server::new_async().await;
     let expected_bundle_prn = "bundle_prn";
     let expected_cohort_prn = "cohort_prn";
     let expected_description = "updated_description";
@@ -171,15 +178,17 @@ async fn update_release() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("PATCH", &*format!("/releases/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/releases/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/releases-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateReleaseParams {
         prn: expected_prn.to_string(),
@@ -228,5 +237,5 @@ async fn update_release() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

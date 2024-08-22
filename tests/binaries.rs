@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::binaries::{
     BinaryState, CreateBinaryParams, GetBinaryParams, UpdateBinaryParams,
@@ -13,6 +13,7 @@ use serde_json::json;
 
 #[tokio::test]
 async fn create_binary() {
+    let mut server = Server::new_async().await;
     let expected_artifact_version_prn = "artifact_version_prn";
     let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "description";
@@ -23,15 +24,17 @@ async fn create_binary() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*format!("/binaries"))
+    let m = server
+        .mock("POST", &*format!("/binaries"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/binaries-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateBinaryParams {
         artifact_version_prn: expected_artifact_version_prn.to_string(),
@@ -67,15 +70,17 @@ async fn create_binary() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 
     let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
-    let m = mock("POST", &*format!("/binaries"))
+    let m = server
+        .mock("POST", &*format!("/binaries"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/binaries-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateBinaryParams {
         artifact_version_prn: expected_artifact_version_prn.to_string(),
@@ -98,6 +103,7 @@ async fn create_binary() {
 
 #[tokio::test]
 async fn get_binary() {
+    let mut server = Server::new_async().await;
     let expected_prn = "prn";
     let expected_artifact_version_prn = "artifact_version_prn";
     let expected_description = "description";
@@ -108,15 +114,17 @@ async fn get_binary() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("GET", &*format!("/binaries/{expected_prn}"))
+    let m = server
+        .mock("GET", &*format!("/binaries/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/binaries-get-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = GetBinaryParams {
         prn: expected_prn.to_string(),
@@ -143,11 +151,12 @@ async fn get_binary() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_binary() {
+    let mut server = Server::new_async().await;
     let expected_artifact_version_prn = "artifact_version_prn";
     let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "description";
@@ -159,15 +168,17 @@ async fn update_binary() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("PATCH", &*format!("/binaries/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/binaries/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/binaries-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateBinaryParams {
         prn: expected_prn.to_string(),
@@ -203,15 +214,17 @@ async fn update_binary() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 
     let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
-    let m = mock("PATCH", &*format!("/binaries/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/binaries/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/binaries-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateBinaryParams {
         prn: expected_prn.to_string(),

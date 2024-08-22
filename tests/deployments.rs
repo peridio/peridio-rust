@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::deployments::{
     CreateDeploymentParams, DeleteDeploymentParams, DeploymentCondition, GetDeploymentParams,
@@ -13,6 +13,7 @@ use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn create_deployment() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
 
     let expected_conditions = DeploymentCondition {
@@ -28,18 +29,20 @@ async fn create_deployment() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "POST",
-        &*format!("/orgs/{organization_name}/products/{expected_product}/deployments"),
-    )
-    .with_status(201)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/deployments-create-201.json")
-    .create();
+    let m = server
+        .mock(
+            "POST",
+            &*format!("/orgs/{organization_name}/products/{expected_product}/deployments"),
+        )
+        .with_status(201)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/deployments-create-201.json")
+        .create_async()
+        .await;
 
     let params = CreateDeploymentParams {
         product_name: expected_product.to_string(),
@@ -63,30 +66,33 @@ async fn create_deployment() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn delete_deployment() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "test";
     let deployment_name = "a";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "DELETE",
-        &*format!(
-            "/orgs/{organization_name}/products/{product_name}/deployments/{deployment_name}"
-        ),
-    )
-    .with_status(204)
-    .with_body("")
-    .create();
+    let m = server
+        .mock(
+            "DELETE",
+            &*format!(
+                "/orgs/{organization_name}/products/{product_name}/deployments/{deployment_name}"
+            ),
+        )
+        .with_status(204)
+        .with_body("")
+        .create_async()
+        .await;
 
     let params = DeleteDeploymentParams {
         organization_name: organization_name.to_string(),
@@ -99,11 +105,12 @@ async fn delete_deployment() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_deployment() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
     let deployment_name = "a";
@@ -119,20 +126,22 @@ async fn get_deployment() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!(
-            "/orgs/{organization_name}/products/{product_name}/deployments/{deployment_name}"
-        ),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/deployments-get-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!(
+                "/orgs/{organization_name}/products/{product_name}/deployments/{deployment_name}"
+            ),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/deployments-get-200.json")
+        .create_async()
+        .await;
 
     let params = GetDeploymentParams {
         organization_name: organization_name.to_string(),
@@ -151,11 +160,12 @@ async fn get_deployment() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn list_deployments() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
 
@@ -175,18 +185,20 @@ async fn list_deployments() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/deployments"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/deployments-list-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!("/orgs/{organization_name}/products/{product_name}/deployments"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/deployments-list-200.json")
+        .create_async()
+        .await;
 
     let params = ListDeploymentParams {
         organization_name: organization_name.to_string(),
@@ -214,11 +226,12 @@ async fn list_deployments() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_deployment() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let deployment_name = "a";
 
@@ -235,20 +248,22 @@ async fn update_deployment() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "PUT",
-        &*format!(
+    let m = server
+        .mock(
+            "PUT",
+            &*format!(
             "/orgs/{organization_name}/products/{expected_product}/deployments/{deployment_name}"
         ),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/deployments-update-200.json")
-    .create();
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/deployments-update-200.json")
+        .create_async()
+        .await;
 
     let params = UpdateDeploymentParams {
         product_name: expected_product.to_string(),
@@ -278,5 +293,5 @@ async fn update_deployment() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

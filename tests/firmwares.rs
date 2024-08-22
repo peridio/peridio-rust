@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::firmwares::{
     CreateFirmwareParams, DeleteFirmwareParams, GetFirmwareParams, ListFirmwareParams,
@@ -12,6 +12,7 @@ use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn create_firmware() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let firmware = "tests/files/firmware_test";
     let ttl = 10;
@@ -28,18 +29,20 @@ async fn create_firmware() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "POST",
-        &*format!("/orgs/{organization_name}/products/{expected_product}/firmwares"),
-    )
-    .with_status(201)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/firmwares-create-201.json")
-    .create();
+    let m = server
+        .mock(
+            "POST",
+            &*format!("/orgs/{organization_name}/products/{expected_product}/firmwares"),
+        )
+        .with_status(201)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/firmwares-create-201.json")
+        .create_async()
+        .await;
 
     let params = CreateFirmwareParams {
         product_name: expected_product.to_string(),
@@ -66,28 +69,33 @@ async fn create_firmware() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn delete_firmware() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "test";
     let firmware_uuid = "4dd9ff49-ec74-45fc-8558-7f98839019ec";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "DELETE",
-        &*format!("/orgs/{organization_name}/products/{product_name}/firmwares/{firmware_uuid}"),
-    )
-    .with_status(204)
-    .with_body("")
-    .create();
+    let m = server
+        .mock(
+            "DELETE",
+            &*format!(
+                "/orgs/{organization_name}/products/{product_name}/firmwares/{firmware_uuid}"
+            ),
+        )
+        .with_status(204)
+        .with_body("")
+        .create_async()
+        .await;
 
     let params = DeleteFirmwareParams {
         organization_name: organization_name.to_string(),
@@ -100,11 +108,12 @@ async fn delete_firmware() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_firmware() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "test";
     let firmware_uuid = "4dd9ff49-ec74-45fc-8558-7f98839019ec";
@@ -121,18 +130,22 @@ async fn get_firmware() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/firmwares/{firmware_uuid}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/firmwares-get-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!(
+                "/orgs/{organization_name}/products/{product_name}/firmwares/{firmware_uuid}"
+            ),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/firmwares-get-200.json")
+        .create_async()
+        .await;
 
     let params = GetFirmwareParams {
         organization_name: organization_name.to_string(),
@@ -158,11 +171,12 @@ async fn get_firmware() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn list_firmwares() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "test";
 
@@ -182,18 +196,20 @@ async fn list_firmwares() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/firmwares"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/firmwares-list-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!("/orgs/{organization_name}/products/{product_name}/firmwares"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/firmwares-list-200.json")
+        .create_async()
+        .await;
 
     let params = ListFirmwareParams {
         organization_name: organization_name.to_string(),
@@ -226,5 +242,5 @@ async fn list_firmwares() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
