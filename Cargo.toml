@@ -25,4 +25,4 @@ validator = { version = "0.18.1", features = ["derive"] }
 
 
 [dev-dependencies]
-mockito = "0.31"
+mockito = "1.5"
