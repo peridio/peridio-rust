@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::artifact_versions::{
     CreateArtifactVersionParams, GetArtifactVersionParams, UpdateArtifactVersionParams,
@@ -13,6 +13,7 @@ use serde_json::json;
 
 #[tokio::test]
 async fn create_artifact_version() {
+    let mut server = Server::new_async().await;
     let expected_artifact_prn = "artifact_prn";
     let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "description";
@@ -20,15 +21,17 @@ async fn create_artifact_version() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*format!("/artifact_versions"))
+    let m = server
+        .mock("POST", &*format!("/artifact_versions"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifact-versions-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateArtifactVersionParams {
         artifact_prn: expected_artifact_prn.to_string(),
@@ -59,15 +62,17 @@ async fn create_artifact_version() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 
     let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
-    let m = mock("POST", &*format!("/artifact_versions"))
+    let m = server
+        .mock("POST", &*format!("/artifact_versions"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifact-versions-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateArtifactVersionParams {
         artifact_prn: expected_artifact_prn.to_string(),
@@ -88,6 +93,7 @@ async fn create_artifact_version() {
 
 #[tokio::test]
 async fn get_artifact_version() {
+    let mut server = Server::new_async().await;
     let expected_prn = "prn";
     let expected_artifact_prn = "artifact_prn";
     let expected_description = "description";
@@ -95,15 +101,17 @@ async fn get_artifact_version() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("GET", &*format!("/artifact_versions/{expected_prn}"))
+    let m = server
+        .mock("GET", &*format!("/artifact_versions/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifact-versions-get-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = GetArtifactVersionParams {
         prn: expected_prn.to_string(),
@@ -127,26 +135,29 @@ async fn get_artifact_version() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_artifact() {
+    let mut server = Server::new_async().await;
     let expected_prn = "prn";
     let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "updated_description";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("PATCH", &*format!("/artifact_versions/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/artifact_versions/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifact-versions-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateArtifactVersionParams {
         prn: expected_prn.to_string(),
@@ -168,15 +179,17 @@ async fn update_artifact() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 
     let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
-    let m = mock("PATCH", &*format!("/artifact_versions/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/artifact_versions/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifact-versions-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateArtifactVersionParams {
         prn: expected_prn.to_string(),

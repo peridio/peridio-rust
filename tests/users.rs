@@ -1,25 +1,28 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn get_users_me_api() {
+    let mut server = Server::new_async().await;
     let expected_email = "a@b.com";
     let expected_username = "c";
     let path = "/users/me".to_string();
 
-    let m = mock("GET", &*path)
+    let m = server
+        .mock("GET", &*path)
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/users-me-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
@@ -31,5 +34,5 @@ async fn get_users_me_api() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

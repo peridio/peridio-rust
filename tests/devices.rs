@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::devices::{
     AuthenticateDeviceParams, CreateDeviceParams, DeleteDeviceParams, GetDeviceParams,
@@ -13,6 +13,7 @@ use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn create_device() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
 
@@ -26,18 +27,20 @@ async fn create_device() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "POST",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices"),
-    )
-    .with_status(201)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/devices-create-201.json")
-    .create();
+    let m = server
+        .mock(
+            "POST",
+            &*format!("/orgs/{organization_name}/products/{product_name}/devices"),
+        )
+        .with_status(201)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/devices-create-201.json")
+        .create_async()
+        .await;
 
     let params = CreateDeviceParams {
         product_name: product_name.to_string(),
@@ -65,28 +68,33 @@ async fn create_device() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn delete_device() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
     let device_identifier = "a";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "DELETE",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}"),
-    )
-    .with_status(204)
-    .with_body("")
-    .create();
+    let m = server
+        .mock(
+            "DELETE",
+            &*format!(
+                "/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}"
+            ),
+        )
+        .with_status(204)
+        .with_body("")
+        .create_async()
+        .await;
 
     let params = DeleteDeviceParams {
         organization_name: organization_name.to_string(),
@@ -99,11 +107,12 @@ async fn delete_device() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_device() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
     let device_identifier = "a";
@@ -115,18 +124,22 @@ async fn get_device() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/devices-get-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!(
+                "/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}"
+            ),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/devices-get-200.json")
+        .create_async()
+        .await;
 
     let params = GetDeviceParams {
         organization_name: organization_name.to_string(),
@@ -147,11 +160,12 @@ async fn get_device() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn list_device() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
 
@@ -165,18 +179,20 @@ async fn list_device() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/devices-list-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!("/orgs/{organization_name}/products/{product_name}/devices"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/devices-list-200.json")
+        .create_async()
+        .await;
 
     let params = ListDeviceParams {
         organization_name: organization_name.to_string(),
@@ -204,11 +220,12 @@ async fn list_device() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_device() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
     let device_identifier = "a";
@@ -220,18 +237,22 @@ async fn update_device() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "PUT",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/devices-update-200.json")
-    .create();
+    let m = server
+        .mock(
+            "PUT",
+            &*format!(
+                "/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}"
+            ),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/devices-update-200.json")
+        .create_async()
+        .await;
 
     let params = UpdateDeviceParams {
         product_name: product_name.to_string(),
@@ -257,11 +278,12 @@ async fn update_device() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn authenticate_device() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
     let certificate = "dGVzdA==";
@@ -273,18 +295,20 @@ async fn authenticate_device() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "POST",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices/auth"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/devices-authenticate-200.json")
-    .create();
+    let m = server
+        .mock(
+            "POST",
+            &*format!("/orgs/{organization_name}/products/{product_name}/devices/auth"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/devices-authenticate-200.json")
+        .create_async()
+        .await;
 
     let params = AuthenticateDeviceParams {
         product_name: product_name.to_string(),
@@ -305,5 +329,5 @@ async fn authenticate_device() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

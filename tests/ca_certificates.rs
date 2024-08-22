@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::ca_certificates::{
     CaCertificateJitp, CreateCaCertificateParams, CreateVerificationCodeParams,
@@ -13,6 +13,7 @@ use peridio_sdk::api::{Api, ApiOptions};
 
 #[tokio::test]
 async fn create_ca_certificate() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let certificate = "cert-base-64";
     let verification_certificate = "verification_cert-base-64";
@@ -26,18 +27,20 @@ async fn create_ca_certificate() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "POST",
-        &*format!("/orgs/{organization_name}/ca_certificates"),
-    )
-    .with_status(201)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/ca-certificates-create-201.json")
-    .create();
+    let m = server
+        .mock(
+            "POST",
+            &*format!("/orgs/{organization_name}/ca_certificates"),
+        )
+        .with_status(201)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/ca-certificates-create-201.json")
+        .create_async()
+        .await;
 
     let jitp = CaCertificateJitp {
         description: jitp_description.to_string(),
@@ -70,27 +73,30 @@ async fn create_ca_certificate() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn delete_ca_certificate() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let ca_certificate_serial = "ABCD-1234";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "DELETE",
-        &*format!("/orgs/{organization_name}/ca_certificates/{ca_certificate_serial}"),
-    )
-    .with_status(204)
-    .with_body("")
-    .create();
+    let m = server
+        .mock(
+            "DELETE",
+            &*format!("/orgs/{organization_name}/ca_certificates/{ca_certificate_serial}"),
+        )
+        .with_status(204)
+        .with_body("")
+        .create_async()
+        .await;
 
     let params = DeleteCaCertificateParams {
         organization_name: organization_name.to_string(),
@@ -102,11 +108,12 @@ async fn delete_ca_certificate() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_ca_certificate() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let ca_certificate_serial = "serial";
 
@@ -114,18 +121,20 @@ async fn get_ca_certificate() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/ca_certificates/{ca_certificate_serial}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/ca-certificates-get-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!("/orgs/{organization_name}/ca_certificates/{ca_certificate_serial}"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/ca-certificates-get-200.json")
+        .create_async()
+        .await;
 
     let params = GetCaCertificateParams {
         organization_name: organization_name.to_string(),
@@ -146,11 +155,12 @@ async fn get_ca_certificate() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn list_ca_certificate() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
 
     let expected_description_0 = "test-0";
@@ -161,18 +171,20 @@ async fn list_ca_certificate() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/ca_certificates"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/ca-certificates-list-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!("/orgs/{organization_name}/ca_certificates"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/ca-certificates-list-200.json")
+        .create_async()
+        .await;
 
     let params = ListCaCertificateParams {
         organization_name: organization_name.to_string(),
@@ -197,29 +209,32 @@ async fn list_ca_certificate() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn create_ca_verification_code() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
 
     let expected_verification_id = "test";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "POST",
-        &*format!("/orgs/{organization_name}/ca_certificates/verification_codes"),
-    )
-    .with_status(201)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/ca-certificates-verification-code-create-201.json")
-    .create();
+    let m = server
+        .mock(
+            "POST",
+            &*format!("/orgs/{organization_name}/ca_certificates/verification_codes"),
+        )
+        .with_status(201)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/ca-certificates-verification-code-create-201.json")
+        .create_async()
+        .await;
 
     let params = CreateVerificationCodeParams {
         organization_name: organization_name.to_string(),
@@ -240,11 +255,12 @@ async fn create_ca_verification_code() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_ca_certificate() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let ca_certificate_serial = "serial";
     let jitp_description = "jitp-test";
@@ -257,18 +273,20 @@ async fn update_ca_certificate() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "PUT",
-        &*format!("/orgs/{organization_name}/ca_certificates/{ca_certificate_serial}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/ca-certificates-update-200.json")
-    .create();
+    let m = server
+        .mock(
+            "PUT",
+            &*format!("/orgs/{organization_name}/ca_certificates/{ca_certificate_serial}"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/ca-certificates-update-200.json")
+        .create_async()
+        .await;
 
     let jitp = CaCertificateJitp {
         description: jitp_description.to_string(),
@@ -298,5 +316,5 @@ async fn update_ca_certificate() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

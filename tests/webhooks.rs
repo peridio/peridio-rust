@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 use peridio_sdk::api::webhooks::CreateWebhookParams;
 use peridio_sdk::api::webhooks::GetWebhookParams;
 use peridio_sdk::api::webhooks::UpdateWebhookParams;
@@ -10,6 +10,7 @@ use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn create_webhook() {
+    let mut server = Server::new_async().await;
     let expected_url = "https://peridio.com";
     let expected_state = "disabled";
     let expected_description = "description";
@@ -18,15 +19,17 @@ async fn create_webhook() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*format!("/webhooks"))
+    let m = server
+        .mock("POST", &*format!("/webhooks"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/webhooks-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateWebhookParams {
         description: Some(expected_description.to_string()),
@@ -48,11 +51,12 @@ async fn create_webhook() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_webhook() {
+    let mut server = Server::new_async().await;
     let expected_description = "description";
     let expected_prn = "prn";
     let expected_state = "enabled";
@@ -61,15 +65,17 @@ async fn get_webhook() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("GET", &*format!("/webhooks/{expected_prn}"))
+    let m = server
+        .mock("GET", &*format!("/webhooks/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/webhooks-get-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = GetWebhookParams {
         prn: expected_prn.to_string(),
@@ -88,11 +94,12 @@ async fn get_webhook() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_webhook() {
+    let mut server = Server::new_async().await;
     let expected_description = "description";
     let expected_prn = "prn";
     let expected_url = "https://peridio.com";
@@ -101,15 +108,17 @@ async fn update_webhook() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("PATCH", &*format!("/webhooks/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/webhooks/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/webhooks-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateWebhookParams {
         prn: expected_prn.to_string(),
@@ -132,5 +141,5 @@ async fn update_webhook() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

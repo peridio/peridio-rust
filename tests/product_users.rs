@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::product_users::{
     AddProductUserParams, GetProductUserParams, ListProductUserParams, RemoveProductUserParams,
@@ -13,6 +13,7 @@ use peridio_sdk::api::ApiOptions;
 
 #[tokio::test]
 async fn add_product_user() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
 
@@ -22,18 +23,20 @@ async fn add_product_user() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "POST",
-        &*format!("/orgs/{organization_name}/products/{product_name}/users"),
-    )
-    .with_status(201)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/product-users-create-201.json")
-    .create();
+    let m = server
+        .mock(
+            "POST",
+            &*format!("/orgs/{organization_name}/products/{product_name}/users"),
+        )
+        .with_status(201)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/product-users-create-201.json")
+        .create_async()
+        .await;
 
     let params = AddProductUserParams {
         organization_name: organization_name.to_string(),
@@ -51,28 +54,31 @@ async fn add_product_user() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn remove_product_user() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
     let user_username = "usr-1";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "DELETE",
-        &*format!("/orgs/{organization_name}/products/{product_name}/users/{user_username}"),
-    )
-    .with_status(204)
-    .with_body("")
-    .create();
+    let m = server
+        .mock(
+            "DELETE",
+            &*format!("/orgs/{organization_name}/products/{product_name}/users/{user_username}"),
+        )
+        .with_status(204)
+        .with_body("")
+        .create_async()
+        .await;
 
     let params = RemoveProductUserParams {
         organization_name: organization_name.to_string(),
@@ -85,11 +91,12 @@ async fn remove_product_user() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn get_product_user() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
     let user_username = "usr-1";
@@ -100,18 +107,20 @@ async fn get_product_user() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/users/{user_username}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/product-users-get-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!("/orgs/{organization_name}/products/{product_name}/users/{user_username}"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/product-users-get-200.json")
+        .create_async()
+        .await;
 
     let params = GetProductUserParams {
         organization_name: organization_name.to_string(),
@@ -128,11 +137,12 @@ async fn get_product_user() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn list_product_user() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
 
@@ -146,18 +156,20 @@ async fn list_product_user() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/users"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/product-users-list-200.json")
-    .create();
+    let m = server
+        .mock(
+            "GET",
+            &*format!("/orgs/{organization_name}/products/{product_name}/users"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/product-users-list-200.json")
+        .create_async()
+        .await;
 
     let params = ListProductUserParams {
         organization_name: organization_name.to_string(),
@@ -179,11 +191,12 @@ async fn list_product_user() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_product_user() {
+    let mut server = Server::new_async().await;
     let organization_name = "org-1";
     let product_name = "pro-1";
     let user_username = "usr-1";
@@ -194,18 +207,20 @@ async fn update_product_user() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock(
-        "PUT",
-        &*format!("/orgs/{organization_name}/products/{product_name}/users/{user_username}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/product-users-update-200.json")
-    .create();
+    let m = server
+        .mock(
+            "PUT",
+            &*format!("/orgs/{organization_name}/products/{product_name}/users/{user_username}"),
+        )
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/product-users-update-200.json")
+        .create_async()
+        .await;
 
     let params = UpdateProductUserParams {
         organization_name: organization_name.to_string(),
@@ -223,5 +238,5 @@ async fn update_product_user() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }

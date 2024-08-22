@@ -1,7 +1,7 @@
 mod common;
 
 use common::API_KEY;
-use mockito::{mock, server_url as mock_server_url};
+use mockito::Server;
 
 use peridio_sdk::api::artifacts::{CreateArtifactParams, GetArtifactParams, UpdateArtifactParams};
 
@@ -10,6 +10,7 @@ use serde_json::json;
 
 #[tokio::test]
 async fn create_artifact() {
+    let mut server = Server::new_async().await;
     let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "test";
     let expected_name = "a";
@@ -17,15 +18,17 @@ async fn create_artifact() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("POST", &*format!("/artifacts"))
+    let m = server
+        .mock("POST", &*format!("/artifacts"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifacts-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateArtifactParams {
         custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
@@ -53,15 +56,17 @@ async fn create_artifact() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 
     let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
-    let m = mock("POST", &*format!("/artifacts"))
+    let m = server
+        .mock("POST", &*format!("/artifacts"))
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifacts-create-201.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = CreateArtifactParams {
         custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
@@ -82,6 +87,7 @@ async fn create_artifact() {
 
 #[tokio::test]
 async fn get_artifact() {
+    let mut server = Server::new_async().await;
     let expected_description = "test";
     let expected_name = "a";
     let expected_organization_prn = "string";
@@ -89,15 +95,17 @@ async fn get_artifact() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("GET", &*format!("/artifacts/{expected_prn}"))
+    let m = server
+        .mock("GET", &*format!("/artifacts/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifacts-get-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = GetArtifactParams {
         prn: expected_prn.to_string(),
@@ -118,11 +126,12 @@ async fn get_artifact() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 }
 
 #[tokio::test]
 async fn update_artifact() {
+    let mut server = Server::new_async().await;
     let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "test-update";
     let expected_name = "b";
@@ -131,15 +140,17 @@ async fn update_artifact() {
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
-        endpoint: Some(mock_server_url()),
+        endpoint: Some(server.url()),
         ca_bundle_path: None,
     });
 
-    let m = mock("PATCH", &*format!("/artifacts/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/artifacts/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifacts-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateArtifactParams {
         prn: expected_prn.to_string(),
@@ -167,15 +178,17 @@ async fn update_artifact() {
         _ => panic!(),
     }
 
-    m.assert();
+    m.assert_async().await;
 
     let expected_custom_metadata = json!({ "foo": "a".repeat(1_000_000 ) });
 
-    let m = mock("PATCH", &*format!("/artifacts/{expected_prn}"))
+    let m = server
+        .mock("PATCH", &*format!("/artifacts/{expected_prn}"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/artifacts-update-200.json")
-        .create();
+        .create_async()
+        .await;
 
     let params = UpdateArtifactParams {
         prn: expected_prn.to_string(),
