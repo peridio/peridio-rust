@@ -18,6 +18,7 @@ async fn create_artifact_version() {
     let expected_custom_metadata = json!({ "foo": "bar" });
     let expected_description = "description";
     let expected_version = "v0.0.1";
+    let expected_id = "uuid";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -37,6 +38,7 @@ async fn create_artifact_version() {
         artifact_prn: expected_artifact_prn.to_string(),
         custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
+        id: Some(expected_id.to_string()),
         version: expected_version.to_string(),
     };
 
@@ -78,6 +80,7 @@ async fn create_artifact_version() {
         artifact_prn: expected_artifact_prn.to_string(),
         custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
+        id: Some(expected_id.to_string()),
         version: expected_version.to_string(),
     };
 

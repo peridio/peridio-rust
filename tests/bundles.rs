@@ -18,6 +18,7 @@ async fn create_bundle() {
     ]
     .to_vec();
     let expected_name = "a";
+    let expected_id = "uuid";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -36,6 +37,7 @@ async fn create_bundle() {
     let params = CreateBundleParams {
         organization_prn: expected_organization_prn.to_string(),
         artifact_version_prns: expected_artifact_versions.clone(),
+        id: Some(expected_id.to_string()),
         name: Some(expected_name.to_string()),
     };
 

@@ -68,6 +68,9 @@ pub struct CreateBinaryParams {
     pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
     pub hash: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub id: Option<String>,
     pub size: u64,
     pub target: String,
 }

@@ -26,6 +26,9 @@ pub struct CreateArtifactParams {
     #[validate(custom(function = "validators::validate_json_byte_length_1_000_000"))]
     pub custom_metadata: Option<Map<String, Value>>,
     pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub id: Option<String>,
     pub name: String,
     pub organization_prn: String,
 }
