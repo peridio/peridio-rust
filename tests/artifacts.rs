@@ -15,6 +15,7 @@ async fn create_artifact() {
     let expected_description = "test";
     let expected_name = "a";
     let expected_organization_prn = "string";
+    let expected_id = "uuid";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -33,6 +34,7 @@ async fn create_artifact() {
     let params = CreateArtifactParams {
         custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
+        id: Some(expected_id.to_string()),
         name: expected_name.to_string(),
         organization_prn: expected_organization_prn.to_string(),
     };
@@ -71,6 +73,7 @@ async fn create_artifact() {
     let params = CreateArtifactParams {
         custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
+        id: Some(expected_id.to_string()),
         name: expected_name.to_string(),
         organization_prn: expected_organization_prn.to_string(),
     };

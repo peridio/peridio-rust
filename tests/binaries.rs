@@ -21,6 +21,7 @@ async fn create_binary() {
     let expected_organization_prn = "organization_prn";
     let expected_size = 10;
     let expected_target = "target";
+    let expected_id = "uuid";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -41,6 +42,7 @@ async fn create_binary() {
         custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
         hash: expected_hash.to_string(),
+        id: Some(expected_id.to_string()),
         size: expected_size,
         target: expected_target.to_string(),
     };
@@ -87,6 +89,7 @@ async fn create_binary() {
         custom_metadata: Some(expected_custom_metadata.as_object().unwrap().clone()),
         description: Some(expected_description.to_string()),
         hash: expected_hash.to_string(),
+        id: Some(expected_id.to_string()),
         size: expected_size,
         target: expected_target.to_string(),
     };

@@ -27,6 +27,9 @@ pub struct CreateArtifactVersionParams {
     pub artifact_prn: String,
     #[validate(custom(function = "validators::validate_json_byte_length_1_000_000"))]
     pub custom_metadata: Option<Map<String, Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub id: Option<String>,
     pub description: Option<String>,
     pub version: String,
 }

@@ -19,6 +19,9 @@ pub struct Bundle {
 #[derive(Debug, Serialize)]
 pub struct CreateBundleParams {
     pub artifact_version_prns: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub id: Option<String>,
     pub organization_prn: String,
     pub name: Option<String>,
 }
