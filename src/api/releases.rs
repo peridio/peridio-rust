@@ -34,6 +34,8 @@ pub struct CreateReleaseParams {
     pub bundle_prn: String,
     pub cohort_prn: String,
     pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub disabled: Option<bool>,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
