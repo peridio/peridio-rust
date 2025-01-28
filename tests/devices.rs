@@ -5,7 +5,7 @@ use mockito::Server;
 
 use peridio_sdk::api::devices::{
     AuthenticateDeviceParams, CreateDeviceParams, DeleteDeviceParams, GetDeviceParams,
-    ListDeviceParams, UpdateDeviceParams,
+    GetUpdateDeviceParams, ListDeviceParams, UpdateDeviceParams,
 };
 
 use peridio_sdk::api::Api;
@@ -325,6 +325,50 @@ async fn authenticate_device() {
             assert_eq!(device.data.healthy, Some(expected_healthy));
             assert_eq!(device.data.identifier, expected_identifier);
             assert_eq!(device.data.last_communication, expected_last_communication);
+        }
+        _ => panic!(),
+    }
+
+    m.assert_async().await;
+}
+
+#[tokio::test]
+async fn get_update_device() {
+    let mut server = Server::new_async().await;
+    let device_prn = "prn-1";
+    let release_prn = "rel-1";
+    let bundle_prn = "bun-1";
+    let release_version = "rev-1";
+
+    let expected_update = "update";
+    let expected_size = 10u32;
+
+    let api = Api::new(ApiOptions {
+        api_key: API_KEY.into(),
+        endpoint: Some(server.url()),
+        ca_bundle_path: None,
+    });
+
+    let m = server
+        .mock("GET", &*format!("/devices/{device_prn}/update"))
+        .match_query(mockito::Matcher::Any)
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/devices-get-update-200.json")
+        .create_async()
+        .await;
+
+    let params = GetUpdateDeviceParams {
+        device_prn: device_prn.to_string(),
+        release_prn: release_prn.to_string().into(),
+        bundle_prn: bundle_prn.to_string().into(),
+        release_version: release_version.to_string().into(),
+    };
+
+    match api.devices().get_update(params).await.unwrap() {
+        Some(device_update) => {
+            assert_eq!(device_update.status, expected_update.to_string());
+            assert_eq!(device_update.manifest.unwrap()[0].size, Some(expected_size));
         }
         _ => panic!(),
     }

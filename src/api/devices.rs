@@ -21,6 +21,34 @@ pub struct Device {
     pub cohort_prn: Option<String>,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DeviceUpdate {
+    pub status: String,
+    pub bundle_prn: Option<String>,
+    pub source_prn: Option<String>,
+    pub source_type: Option<String>,
+    pub manifest: Option<Vec<UpdateManifest>>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct UpdateManifest {
+    pub artifact_prn: Option<String>,
+    pub artifact_version_prn: Option<String>,
+    pub custom_metadata: Option<String>,
+    pub prn: Option<String>,
+    pub hash: Option<String>,
+    pub signatures: Option<Vec<UpdateSignature>>,
+    pub size: Option<u32>,
+    pub target: Option<String>,
+    pub url: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct UpdateSignature {
+    pub signing_key_prn: Option<String>,
+    pub signature: Option<String>,
+}
+
 #[derive(Debug, Deserialize, Serialize, Eq, PartialEq)]
 pub struct FirmwareMetadata {
     pub architecture: String,
@@ -126,6 +154,22 @@ pub struct AuthenticateDeviceResponse {
     pub data: Device,
 }
 
+#[derive(Debug, Serialize)]
+pub struct GetUpdateDeviceParams {
+    pub device_prn: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub release_prn: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub bundle_prn: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub release_version: Option<String>,
+}
+
+type GetUpdateDeviceResponse = DeviceUpdate;
+
 pub struct DevicesApi<'a>(pub &'a Api);
 
 impl<'a> DevicesApi<'a> {
@@ -227,6 +271,33 @@ impl<'a> DevicesApi<'a> {
                 Method::POST,
                 format!("/orgs/{organization_name}/products/{product_name}/devices/auth"),
                 Some(json_body!(&params)),
+            )
+            .await
+    }
+
+    pub async fn get_update(
+        &'a self,
+        params: GetUpdateDeviceParams,
+    ) -> Result<Option<GetUpdateDeviceResponse>, Error> {
+        let device_prn = &params.device_prn;
+
+        let mut query_params = Vec::new();
+        if let Some(release_prn) = params.release_prn {
+            query_params.push(("release_prn".into(), release_prn))
+        }
+        if let Some(release_version) = params.release_version {
+            query_params.push(("release_version".into(), release_version))
+        }
+        if let Some(bundle_prn) = params.bundle_prn {
+            query_params.push(("bundle_prn".into(), bundle_prn))
+        }
+
+        self.0
+            .execute_with_params(
+                Method::GET,
+                format!("/devices/{device_prn}/update"),
+                None,
+                query_params,
             )
             .await
     }
