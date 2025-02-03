@@ -166,6 +166,8 @@ pub struct GetUpdateDeviceParams {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub release_version: Option<String>,
+    #[serde(default)]
+    pub write: bool,
 }
 
 type GetUpdateDeviceResponse = DeviceUpdate;
@@ -281,23 +283,11 @@ impl<'a> DevicesApi<'a> {
     ) -> Result<Option<GetUpdateDeviceResponse>, Error> {
         let device_prn = &params.device_prn;
 
-        let mut query_params = Vec::new();
-        if let Some(release_prn) = params.release_prn {
-            query_params.push(("release_prn".into(), release_prn))
-        }
-        if let Some(release_version) = params.release_version {
-            query_params.push(("release_version".into(), release_version))
-        }
-        if let Some(bundle_prn) = params.bundle_prn {
-            query_params.push(("bundle_prn".into(), bundle_prn))
-        }
-
         self.0
-            .execute_with_params(
-                Method::GET,
+            .execute(
+                Method::POST,
                 format!("/devices/{device_prn}/update"),
-                None,
-                query_params,
+                Some(json_body!(&params)),
             )
             .await
     }
