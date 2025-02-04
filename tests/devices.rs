@@ -350,8 +350,7 @@ async fn get_update_device() {
     });
 
     let m = server
-        .mock("GET", &*format!("/devices/{device_prn}/update"))
-        .match_query(mockito::Matcher::Any)
+        .mock("POST", &*format!("/devices/{device_prn}/update"))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body_from_file("tests/fixtures/devices-get-update-200.json")
@@ -363,6 +362,7 @@ async fn get_update_device() {
         release_prn: release_prn.to_string().into(),
         bundle_prn: bundle_prn.to_string().into(),
         release_version: release_version.to_string().into(),
+        write: false,
     };
 
     match api.devices().get_update(params).await.unwrap() {
