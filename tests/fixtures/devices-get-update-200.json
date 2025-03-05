@@ -1,8 +1,11 @@
 {
-    "status": "update",
-    "manifest": [
-        {
-            "size": 10
-        }
-    ]
+  "status": "update",
+  "manifest": [
+    {
+      "size": 10,
+      "custom_metadata": {
+        "install": "flash"
+      }
+    }
+  ]
 }

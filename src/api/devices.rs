@@ -1,5 +1,6 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use crate::{json_body, Api};
 
@@ -34,7 +35,7 @@ pub struct DeviceUpdate {
 pub struct UpdateManifest {
     pub artifact_prn: Option<String>,
     pub artifact_version_prn: Option<String>,
-    pub custom_metadata: Option<String>,
+    pub custom_metadata: Option<HashMap<String, serde_json::Value>>,
     pub prn: Option<String>,
     pub hash: Option<String>,
     pub signatures: Option<Vec<UpdateSignature>>,
