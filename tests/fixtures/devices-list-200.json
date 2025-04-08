@@ -1,54 +1,21 @@
 {
-  "data": [
+  "devices": [
     {
-      "description": "test",
-      "firmware_metadata": {
-        "architecture": "arm",
-        "author": "sagan",
-        "description": "it is what it is",
-        "fwup_version": "1.9.1",
-        "misc": "who knows",
-        "platform": "rock_solid",
-        "product": "of my circumstances",
-        "uuid": "c7a000a0-78bd-47d5-8944-6ee9c18aa0a4",
-        "vcs_identifier": "88abe2e",
-        "version": "unknown"
-      },
-      "healthy": false,
-      "identifier": "a",
-      "last_communication": "date",
-      "status": "offline",
-      "tags": [
-        "tag-1",
-        "tag-2"
-      ],
-      "version": "1.0.0",
-      "prn": "prn"
-    },
-    {
-      "description": "test-2",
-      "firmware_metadata": {
-        "architecture": "arm",
-        "author": "sagan",
-        "description": "it is what it is",
-        "fwup_version": "1.9.1",
-        "misc": "who knows",
-        "platform": "rock_solid",
-        "product": "of my circumstances",
-        "uuid": "c7a000a0-78bd-47d5-8944-6ee9c18aa0a4",
-        "vcs_identifier": "88abe2e",
-        "version": "unknown"
-      },
-      "healthy": true,
-      "identifier": "b",
-      "last_communication": "date",
-      "status": "offline",
-      "tags": [
-        "tag-3",
-        "tag-4"
-      ],
-      "version": "1.0.0",
-      "prn": "prn"
+      "product_prn": "prn:1:be4d30b4-de6b-47cd-85ea-a75e23fd63ef:product:b3f1f699-3bc8-4c77-bda2-b974595d5e3f",
+      "cohort_prn": "prn:1:be4d30b4-de6b-47cd-85ea-a75e23fd63ef:cohort:b3f1f699-3bc8-4c77-bda2-b974595d5e3f",
+      "description": "some description",
+      "quarantined": false,
+      "identifier": "sn1234",
+      "inserted_at": "2019-08-24T14:15:22Z",
+      "last_connected_at": "2019-08-24T14:15:22Z",
+      "prn": "prn:1:be4d30b4-de6b-47cd-85ea-a75e23fd63ef:device:b3f1f699-3bc8-4c77-bda2-b974595d5e3f",
+      "tags": ["tag-1"],
+      "target": "arm-linux-androideabi",
+      "reported_release_prn": "prn:1:be4d30b4-de6b-47cd-85ea-a75e23fd63ef:release:b3f1f699-3bc8-4c77-bda2-b974595d5e3f",
+      "reported_release_version": "1.0.0",
+      "reported_bundle_prn": "prn:1:be4d30b4-de6b-47cd-85ea-a75e23fd63ef:bundle:c0c25d62-26d4-40b8-b9ab-609936d5d6d0",
+      "updated_at": "2019-08-24T14:15:22Z"
     }
-  ]
+  ],
+  "next_page": "string"
 }

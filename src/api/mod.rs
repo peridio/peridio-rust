@@ -15,7 +15,6 @@ pub mod error;
 pub mod events;
 pub mod firmwares;
 pub mod products;
-pub mod products_v2;
 pub mod releases;
 pub mod signing_keys;
 pub mod tunnels;
@@ -44,8 +43,7 @@ pub use deployments::DeploymentsApi;
 pub use device_certificates::DeviceCertificatesApi;
 pub use devices::DevicesApi;
 pub use firmwares::FirmwaresApi;
-pub use products::ProductApi;
-pub use products_v2::ProductsV2Api;
+pub use products::ProductsApi;
 pub use releases::ReleasesApi;
 pub use reqwest::Body;
 pub use signing_keys::SigningKeysApi;
@@ -401,12 +399,8 @@ impl Api {
         FirmwaresApi(self)
     }
 
-    pub fn products(&self) -> ProductApi {
-        ProductApi(self)
-    }
-
-    pub fn products_v2(&self) -> ProductsV2Api {
-        ProductsV2Api(self)
+    pub fn products(&self) -> ProductsApi {
+        ProductsApi(self)
     }
 
     pub fn releases(&self) -> ReleasesApi {
