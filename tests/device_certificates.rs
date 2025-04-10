@@ -14,9 +14,7 @@ use peridio_sdk::api::ApiOptions;
 #[tokio::test]
 async fn create_device_certificate() {
     let mut server = Server::new_async().await;
-    let organization_name = "org-1";
-    let product_name = "pro-1";
-    let device_identifier = "dev-id-1";
+    let device_prn = "dev-prn-1";
     let cert = "cert-1";
 
     let expected_not_after = "then";
@@ -29,29 +27,26 @@ async fn create_device_certificate() {
         ca_bundle_path: None,
     });
 
-    let m = server.mock(
-        "POST",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}/certificates"),
-    )
-    .with_status(201)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/device-certificates-create-201.json")
-    .create_async().await;
+    let m = server
+        .mock("POST", &*format!("/device_certificates"))
+        .with_status(201)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/device-certificates-create-201.json")
+        .create_async()
+        .await;
 
     let params = CreateDeviceCertificateParams {
-        product_name: product_name.to_string(),
-        organization_name: organization_name.to_string(),
-        device_identifier: device_identifier.to_string(),
-        cert: cert.to_string(),
+        device_prn: device_prn.to_string(),
+        certificate: cert.to_string(),
     };
 
-    match api.device_certificates().create(params).await.unwrap() {
-        Some(device_certificate) => {
-            assert_eq!(device_certificate.data.not_after, expected_not_after);
-            assert_eq!(device_certificate.data.not_before, expected_not_before);
-            assert_eq!(device_certificate.data.serial, expected_serial);
-        }
-        _ => panic!(),
+    if let Some(response) = api.device_certificates().create(params).await.unwrap() {
+        let device_cert = response.device_certificate;
+        assert_eq!(device_cert.not_after, expected_not_after);
+        assert_eq!(device_cert.not_before, expected_not_before);
+        assert_eq!(device_cert.serial, expected_serial);
+    } else {
+        panic!();
     }
 
     m.assert_async().await;
@@ -60,10 +55,7 @@ async fn create_device_certificate() {
 #[tokio::test]
 async fn delete_device_certificate() {
     let mut server = Server::new_async().await;
-    let organization_name = "org-1";
-    let product_name = "pro-1";
-    let device_identifier = "a";
-    let certificate_serial = "serial";
+    let prn = "prn-1";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -71,19 +63,15 @@ async fn delete_device_certificate() {
         ca_bundle_path: None,
     });
 
-    let m = server.mock(
-        "DELETE",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}/certificates/{certificate_serial}"),
-    )
-    .with_status(204)
-    .with_body("")
-    .create_async().await;
+    let m = server
+        .mock("DELETE", &*format!("/device_certificates/{prn}"))
+        .with_status(204)
+        .with_body("")
+        .create_async()
+        .await;
 
     let params = DeleteDeviceCertificateParams {
-        organization_name: organization_name.to_string(),
-        product_name: product_name.to_string(),
-        device_identifier: device_identifier.to_string(),
-        certificate_serial: certificate_serial.to_string(),
+        prn: prn.to_string(),
     };
 
     match api.device_certificates().delete(params).await.unwrap() {
@@ -97,10 +85,7 @@ async fn delete_device_certificate() {
 #[tokio::test]
 async fn get_device_certificate() {
     let mut server = Server::new_async().await;
-    let organization_name = "org-1";
-    let product_name = "pro-1";
-    let device_identifier = "a";
-    let certificate_serial = "serial";
+    let prn = "prn-1";
 
     let expected_not_after = "then";
     let expected_not_before = "now";
@@ -112,29 +97,25 @@ async fn get_device_certificate() {
         ca_bundle_path: None,
     });
 
-    let m = server.mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}/certificates/{certificate_serial}"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/device-certificates-get-200.json")
-    .create_async().await;
+    let m = server
+        .mock("GET", &*format!("/device_certificates/{prn}"))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/device-certificates-get-200.json")
+        .create_async()
+        .await;
 
     let params = GetDeviceCertificateParams {
-        organization_name: organization_name.to_string(),
-        product_name: product_name.to_string(),
-        device_identifier: device_identifier.to_string(),
-        certificate_serial: certificate_serial.to_string(),
+        prn: prn.to_string(),
     };
 
-    match api.device_certificates().get(params).await.unwrap() {
-        Some(device_certificate) => {
-            assert_eq!(device_certificate.data.not_after, expected_not_after);
-            assert_eq!(device_certificate.data.not_before, expected_not_before);
-            assert_eq!(device_certificate.data.serial, expected_serial);
-        }
-        _ => panic!(),
+    if let Some(response) = api.device_certificates().get(params).await.unwrap() {
+        let device_cert = response.device_certificate;
+        assert_eq!(device_cert.not_after, expected_not_after);
+        assert_eq!(device_cert.not_before, expected_not_before);
+        assert_eq!(device_cert.serial, expected_serial);
+    } else {
+        panic!();
     }
 
     m.assert_async().await;
@@ -143,16 +124,15 @@ async fn get_device_certificate() {
 #[tokio::test]
 async fn list_device_certificate() {
     let mut server = Server::new_async().await;
-    let organization_name = "org-1";
-    let product_name = "pro-1";
-    let device_identifier = "a";
 
     let expected_not_after_0 = "then-0";
     let expected_not_before_0 = "now-0";
+    let expected_prn_0 = "prn-1";
     let expected_serial_0 = "serial-0";
 
     let expected_not_after_1 = "then-1";
     let expected_not_before_1 = "now-1";
+    let expected_prn_1 = "prn-2";
     let expected_serial_1 = "serial-1";
 
     let api = Api::new(ApiOptions {
@@ -161,34 +141,31 @@ async fn list_device_certificate() {
         ca_bundle_path: None,
     });
 
-    let m = server.mock(
-        "GET",
-        &*format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}/certificates"),
-    )
-    .with_status(200)
-    .with_header("content-type", "application/json")
-    .with_body_from_file("tests/fixtures/device-certificates-list-200.json")
-    .create_async().await;
+    let m = server
+        .mock("GET", &*format!("/device_certificates"))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/device-certificates-list-200.json")
+        .create_async()
+        .await;
 
-    let params = ListDeviceCertificateParams {
-        organization_name: organization_name.to_string(),
-        product_name: product_name.to_string(),
-        device_identifier: device_identifier.to_string(),
-    };
+    let params = ListDeviceCertificateParams::default();
 
-    match api.device_certificates().list(params).await.unwrap() {
-        Some(device_certificate) => {
-            assert_eq!(device_certificate.data.len(), 2);
+    if let Some(response) = api.device_certificates().list(params).await.unwrap() {
+        let device_certificates = response.device_certificates;
+        assert_eq!(device_certificates.len(), 2);
 
-            assert_eq!(device_certificate.data[0].not_after, expected_not_after_0);
-            assert_eq!(device_certificate.data[0].not_before, expected_not_before_0);
-            assert_eq!(device_certificate.data[0].serial, expected_serial_0);
+        assert_eq!(device_certificates[0].not_after, expected_not_after_0);
+        assert_eq!(device_certificates[0].not_before, expected_not_before_0);
+        assert_eq!(device_certificates[0].prn, expected_prn_0);
+        assert_eq!(device_certificates[0].serial, expected_serial_0);
 
-            assert_eq!(device_certificate.data[1].not_after, expected_not_after_1);
-            assert_eq!(device_certificate.data[1].not_before, expected_not_before_1);
-            assert_eq!(device_certificate.data[1].serial, expected_serial_1);
-        }
-        _ => panic!(),
+        assert_eq!(device_certificates[1].not_after, expected_not_after_1);
+        assert_eq!(device_certificates[1].not_before, expected_not_before_1);
+        assert_eq!(device_certificates[1].prn, expected_prn_1);
+        assert_eq!(device_certificates[1].serial, expected_serial_1);
+    } else {
+        panic!();
     }
 
     m.assert_async().await;
