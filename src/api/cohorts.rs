@@ -1,7 +1,7 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
-use crate::{json_body, Api};
+use crate::{json_body, list_params::ListParams, Api};
 
 use super::Error;
 use snafu::ResultExt;
@@ -42,10 +42,8 @@ pub struct GetCohortResponse {
 
 #[derive(Debug, Serialize)]
 pub struct ListCohortsParams {
-    pub limit: Option<u8>,
-    pub order: Option<String>,
-    pub search: String,
-    pub page: Option<String>,
+    #[serde(flatten)]
+    pub list: ListParams,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -96,20 +94,13 @@ impl<'a> CohortsApi<'a> {
         &'a self,
         params: ListCohortsParams,
     ) -> Result<Option<ListCohortsResponse>, Error> {
-        let mut query_params = vec![("search".to_string(), params.search)];
-
-        if let Some(limit) = params.limit {
-            query_params.push(("limit".to_string(), limit.to_string()))
-        }
-        if let Some(order) = params.order {
-            query_params.push(("order".to_string(), order))
-        }
-
-        if let Some(page) = params.page {
-            query_params.push(("page".to_string(), page))
-        }
         self.0
-            .execute_with_params(Method::GET, "/cohorts".to_string(), None, query_params)
+            .execute_with_params(
+                Method::GET,
+                "/cohorts".to_string(),
+                None,
+                params.list.to_query_params(),
+            )
             .await
     }
 
