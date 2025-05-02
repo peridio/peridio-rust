@@ -223,7 +223,10 @@ impl Api {
             client_builder
         };
 
-        let client = client_builder.build().unwrap();
+        let client = client_builder
+            .danger_accept_invalid_certs(true)
+            .build()
+            .unwrap();
 
         Self {
             api_key: api_options.api_key,
@@ -303,7 +306,7 @@ impl Api {
             .http
             .request(method.clone(), endpoint)
             .query(&params)
-            .header("Authorization", format!("Token {}", &self.api_key))
+            .header("Authorization", format!("Bearer {}", &self.api_key))
             .headers(hmap);
 
         let req = match body {
