@@ -3,7 +3,9 @@ mod common;
 use common::API_KEY;
 use mockito::Server;
 
-use peridio_sdk::api::releases::{CreateReleaseParams, GetReleaseParams, UpdateReleaseParams};
+use peridio_sdk::api::releases::{
+    CreateReleaseParams, DeleteReleaseParams, GetReleaseParams, UpdateReleaseParams,
+};
 
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
@@ -85,6 +87,36 @@ async fn create_release() {
                 Some(expected_version_requirement.to_string())
             );
         }
+        _ => panic!(),
+    }
+
+    m.assert_async().await;
+}
+
+#[tokio::test]
+async fn delete_release() {
+    let mut server = Server::new_async().await;
+    let expected_prn = "prn";
+
+    let api = Api::new(ApiOptions {
+        api_key: API_KEY.into(),
+        endpoint: Some(server.url()),
+        ca_bundle_path: None,
+    });
+
+    let m = server
+        .mock("DELETE", &*format!("/releases/{expected_prn}"))
+        .with_status(204)
+        .with_header("content-type", "application/json")
+        .create_async()
+        .await;
+
+    let params = DeleteReleaseParams {
+        prn: expected_prn.to_string(),
+    };
+
+    match api.releases().delete(params).await.unwrap() {
+        None => (),
         _ => panic!(),
     }
 
