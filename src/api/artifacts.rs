@@ -49,6 +49,14 @@ pub struct GetArtifactResponse {
 }
 
 #[derive(Debug, Serialize)]
+pub struct DeleteArtifactParams {
+    pub prn: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DeleteArtifactResponse {}
+
+#[derive(Debug, Serialize)]
 pub struct ListArtifactsParams {
     pub limit: Option<u8>,
     pub order: Option<String>,
@@ -97,6 +105,16 @@ impl<'a> ArtifactsApi<'a> {
             }
             Err(err) => Err(err),
         }
+    }
+
+    pub async fn delete(
+        &'a self,
+        params: DeleteArtifactParams,
+    ) -> Result<Option<DeleteArtifactResponse>, Error> {
+        let artifact_prn: String = params.prn;
+        self.0
+            .execute(Method::DELETE, format!("/artifacts/{artifact_prn}"), None)
+            .await
     }
 
     pub async fn get(
