@@ -42,6 +42,14 @@ pub struct GetBundleResponse {
 }
 
 #[derive(Debug, Serialize)]
+pub struct DeleteBundleParams {
+    pub prn: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DeleteBundleResponse {}
+
+#[derive(Debug, Serialize)]
 pub struct ListBundlesParams {
     pub limit: Option<u8>,
     pub order: Option<String>,
@@ -77,6 +85,16 @@ impl<'a> BundlesApi<'a> {
     ) -> Result<Option<CreateBundleResponse>, Error> {
         self.0
             .execute(Method::POST, "/bundles", Some(json_body!(&params)))
+            .await
+    }
+
+    pub async fn delete(
+        &'a self,
+        params: DeleteBundleParams,
+    ) -> Result<Option<DeleteBundleResponse>, Error> {
+        let bundle_prn: String = params.prn;
+        self.0
+            .execute(Method::DELETE, format!("/bundles/{bundle_prn}"), None)
             .await
     }
 
