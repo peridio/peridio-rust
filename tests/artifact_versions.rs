@@ -4,7 +4,8 @@ use common::API_KEY;
 use mockito::Server;
 
 use peridio_sdk::api::artifact_versions::{
-    CreateArtifactVersionParams, GetArtifactVersionParams, UpdateArtifactVersionParams,
+    CreateArtifactVersionParams, DeleteArtifactVersionParams, GetArtifactVersionParams,
+    UpdateArtifactVersionParams,
 };
 
 use peridio_sdk::api::Api;
@@ -92,6 +93,36 @@ async fn create_artifact_version() {
     }
 
     m.expect(0);
+}
+
+#[tokio::test]
+async fn delete_artifact_version() {
+    let mut server = Server::new_async().await;
+    let expected_prn = "prn";
+
+    let api = Api::new(ApiOptions {
+        api_key: API_KEY.into(),
+        endpoint: Some(server.url()),
+        ca_bundle_path: None,
+    });
+
+    let m = server
+        .mock("DELETE", &*format!("/artifact_versions/{expected_prn}"))
+        .with_status(204)
+        .with_header("content-type", "application/json")
+        .create_async()
+        .await;
+
+    let params = DeleteArtifactVersionParams {
+        prn: expected_prn.to_string(),
+    };
+
+    match api.artifact_versions().delete(params).await.unwrap() {
+        None => (),
+        _ => panic!(),
+    }
+
+    m.assert_async().await;
 }
 
 #[tokio::test]

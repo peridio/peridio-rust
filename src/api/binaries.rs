@@ -86,6 +86,14 @@ pub struct GetBinaryParams {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct DeleteBinaryParams {
+    pub prn: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DeleteBinaryResponse {}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct GetBinaryResponse {
     pub binary: Binary,
 }
@@ -145,6 +153,16 @@ impl<'a> BinariesApi<'a> {
             }
             Err(err) => Err(err),
         }
+    }
+
+    pub async fn delete(
+        &'a self,
+        params: DeleteBinaryParams,
+    ) -> Result<Option<DeleteBinaryResponse>, Error> {
+        let binary_prn: String = params.prn;
+        self.0
+            .execute(Method::DELETE, format!("/binaries/{binary_prn}"), None)
+            .await
     }
 
     pub async fn get(

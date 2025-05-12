@@ -76,6 +76,13 @@ pub struct GetReleaseResponse {
 }
 
 #[derive(Debug, Serialize)]
+pub struct DeleteReleaseParams {
+    pub prn: String,
+}
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DeleteReleaseResponse {}
+
+#[derive(Debug, Serialize)]
 pub struct ListReleasesParams {
     pub limit: Option<u8>,
     pub order: Option<String>,
@@ -151,6 +158,16 @@ impl<'a> ReleasesApi<'a> {
         let release_prn: String = params.prn;
         self.0
             .execute(Method::GET, format!("/releases/{release_prn}"), None)
+            .await
+    }
+
+    pub async fn delete(
+        &'a self,
+        params: DeleteReleaseParams,
+    ) -> Result<Option<DeleteReleaseResponse>, Error> {
+        let release_prn: String = params.prn;
+        self.0
+            .execute(Method::DELETE, format!("/releases/{release_prn}"), None)
             .await
     }
 

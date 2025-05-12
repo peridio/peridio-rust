@@ -3,7 +3,9 @@ mod common;
 use common::API_KEY;
 use mockito::Server;
 
-use peridio_sdk::api::bundles::{CreateBundleParams, GetBundleParams, UpdateBundleParams};
+use peridio_sdk::api::bundles::{
+    CreateBundleParams, DeleteBundleParams, GetBundleParams, UpdateBundleParams,
+};
 
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
@@ -50,6 +52,36 @@ async fn create_bundle() {
 
             assert_eq!(bundle.bundle.artifact_versions, expected_artifact_versions);
         }
+        _ => panic!(),
+    }
+
+    m.assert_async().await;
+}
+
+#[tokio::test]
+async fn delete_bundle() {
+    let mut server = Server::new_async().await;
+    let expected_prn = "prn";
+
+    let api = Api::new(ApiOptions {
+        api_key: API_KEY.into(),
+        endpoint: Some(server.url()),
+        ca_bundle_path: None,
+    });
+
+    let m = server
+        .mock("DELETE", &*format!("/bundles/{expected_prn}"))
+        .with_status(204)
+        .with_header("content-type", "application/json")
+        .create_async()
+        .await;
+
+    let params = DeleteBundleParams {
+        prn: expected_prn.to_string(),
+    };
+
+    match api.bundles().delete(params).await.unwrap() {
+        None => (),
         _ => panic!(),
     }
 
