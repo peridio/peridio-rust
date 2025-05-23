@@ -8,14 +8,11 @@ pub mod binary_signatures;
 pub mod bundles;
 pub mod ca_certificates;
 pub mod cohorts;
-pub mod deployments;
 pub mod device_certificates;
 pub mod devices;
 pub mod error;
 pub mod events;
-pub mod firmwares;
 pub mod products;
-pub mod products_v2;
 pub mod releases;
 pub mod signing_keys;
 pub mod tunnels;
@@ -40,12 +37,9 @@ pub use binary_parts::BinaryPartsApi;
 pub use binary_signatures::BinarySignaturesApi;
 pub use ca_certificates::CaCertificatesApi;
 pub use cohorts::CohortsApi;
-pub use deployments::DeploymentsApi;
 pub use device_certificates::DeviceCertificatesApi;
 pub use devices::DevicesApi;
-pub use firmwares::FirmwaresApi;
-pub use products::ProductApi;
-pub use products_v2::ProductsV2Api;
+pub use products::ProductsApi;
 pub use releases::ReleasesApi;
 pub use reqwest::Body;
 pub use signing_keys::SigningKeysApi;
@@ -65,7 +59,6 @@ type ContentType = &'static str;
 
 enum BodyType {
     Body((ContentType, Body)),
-    Multipart(reqwest::multipart::Form),
 }
 
 #[derive(Debug, Snafu)]
@@ -120,13 +113,6 @@ macro_rules! json_body {
                 .context(super::JsonSerializationFailed)?
                 .into(),
         ))
-    };
-}
-
-#[macro_export]
-macro_rules! multipart_body {
-    ($v:expr) => {
-        $crate::api::BodyType::Multipart(($v.into()))
     };
 }
 
@@ -325,7 +311,6 @@ impl Api {
                 .header(header::CONTENT_TYPE, content_type)
                 .body(body)
                 .build(),
-            Some(BodyType::Multipart(multipart)) => req_builder.multipart(multipart).build(),
             None => req_builder.build(),
         };
 
@@ -393,20 +378,8 @@ impl Api {
         DeviceCertificatesApi(self)
     }
 
-    pub fn deployments(&self) -> DeploymentsApi {
-        DeploymentsApi(self)
-    }
-
-    pub fn firmwares(&self) -> FirmwaresApi {
-        FirmwaresApi(self)
-    }
-
-    pub fn products(&self) -> ProductApi {
-        ProductApi(self)
-    }
-
-    pub fn products_v2(&self) -> ProductsV2Api {
-        ProductsV2Api(self)
+    pub fn products(&self) -> ProductsApi {
+        ProductsApi(self)
     }
 
     pub fn releases(&self) -> ReleasesApi {

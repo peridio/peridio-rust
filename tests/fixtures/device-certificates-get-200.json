@@ -1,7 +1,8 @@
 {
-    "data": {
-        "not_after": "then",
-        "not_before": "now",
-        "serial": "serial"
-    }
+  "device_certificate": {
+    "not_after": "then",
+    "not_before": "now",
+    "prn": "prn-1",
+    "serial": "serial"
+  }
 }

@@ -1,62 +1,55 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
-use crate::{json_body, Api};
+use crate::{json_body, list_params::ListParams, Api};
 
 use super::Error;
 use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct DeviceCertificates {
+pub struct DeviceCertificate {
     pub not_after: String,
     pub not_before: String,
+    pub prn: String,
     pub serial: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Default)]
 pub struct ListDeviceCertificateParams {
-    pub organization_name: String,
-    pub product_name: String,
-    pub device_identifier: String,
+    #[serde(flatten)]
+    pub list: ListParams,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ListDeviceCertificateResponse {
-    pub data: Vec<DeviceCertificates>,
+    pub device_certificates: Vec<DeviceCertificate>,
+    pub next_page: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct GetDeviceCertificateParams {
-    pub product_name: String,
-    pub organization_name: String,
-    pub certificate_serial: String,
-    pub device_identifier: String,
+    pub prn: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct GetDeviceCertificateResponse {
-    pub data: DeviceCertificates,
+    pub device_certificate: DeviceCertificate,
 }
 
 #[derive(Debug, Serialize)]
 pub struct DeleteDeviceCertificateParams {
-    pub product_name: String,
-    pub organization_name: String,
-    pub certificate_serial: String,
-    pub device_identifier: String,
+    pub prn: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct CreateDeviceCertificateParams {
-    pub product_name: String,
-    pub organization_name: String,
-    pub device_identifier: String,
-    pub cert: String,
+    pub certificate: String,
+    pub device_prn: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreateDeviceCertificateResponse {
-    pub data: DeviceCertificates,
+    pub device_certificate: DeviceCertificate,
 }
 
 pub struct DeviceCertificatesApi<'a>(pub &'a Api);
@@ -66,14 +59,10 @@ impl<'a> DeviceCertificatesApi<'a> {
         &'a self,
         params: CreateDeviceCertificateParams,
     ) -> Result<Option<CreateDeviceCertificateResponse>, Error> {
-        let product_name = &params.product_name;
-        let organization_name = &params.organization_name;
-        let device_identifier = &params.device_identifier;
-
         self.0
             .execute(
                 Method::POST,
-                format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}/certificates"),
+                "/device_certificates".to_string(),
                 Some(json_body!(&params)),
             )
             .await
@@ -83,19 +72,10 @@ impl<'a> DeviceCertificatesApi<'a> {
         &'a self,
         params: DeleteDeviceCertificateParams,
     ) -> Result<Option<()>, Error> {
-        let product_name = params.product_name;
-        let organization_name = params.organization_name;
-        let device_identifier = params.device_identifier;
-        let certificate_serial = params.certificate_serial;
+        let prn = params.prn;
 
         self.0
-            .execute(
-                Method::DELETE,
-                format!(
-                    "/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}/certificates/{certificate_serial}"
-                ),
-                None,
-            )
+            .execute(Method::DELETE, format!("/device_certificates/{prn}"), None)
             .await
     }
 
@@ -103,19 +83,10 @@ impl<'a> DeviceCertificatesApi<'a> {
         &'a self,
         params: GetDeviceCertificateParams,
     ) -> Result<Option<GetDeviceCertificateResponse>, Error> {
-        let product_name = params.product_name;
-        let organization_name = params.organization_name;
-        let device_identifier = params.device_identifier;
-        let certificate_serial = params.certificate_serial;
+        let prn = params.prn;
 
         self.0
-            .execute(
-                Method::GET,
-                format!(
-                    "/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}/certificates/{certificate_serial}"
-                ),
-                None,
-            )
+            .execute(Method::GET, format!("/device_certificates/{prn}"), None)
             .await
     }
 
@@ -123,15 +94,12 @@ impl<'a> DeviceCertificatesApi<'a> {
         &'a self,
         params: ListDeviceCertificateParams,
     ) -> Result<Option<ListDeviceCertificateResponse>, Error> {
-        let organization_name = params.organization_name;
-        let product_name = params.product_name;
-        let device_identifier = params.device_identifier;
-
         self.0
-            .execute(
+            .execute_with_params(
                 Method::GET,
-                format!("/orgs/{organization_name}/products/{product_name}/devices/{device_identifier}/certificates"),
+                "/device_certificates".to_string(),
                 None,
+                params.list.to_query_params(),
             )
             .await
     }
