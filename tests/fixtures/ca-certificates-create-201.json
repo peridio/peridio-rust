@@ -1,17 +1,9 @@
 {
-    "data": {
-        "description": "test",
-        "not_after": "then",
-        "not_before": "now",
-        "serial": "serial",
-        "jitp": {
-            "description": "jitp-test",
-            "product_name": "pro-1",
-            "tags": [
-                "tag-1"
-            ],
-            "target": "test-target",
-            "cohort_prn": "test"
-        }
-    }
+  "ca_certificate": {
+    "description": "test",
+    "not_after": "then",
+    "not_before": "now",
+    "serial": "serial",
+    "prn": "prn-1"
+  }
 }

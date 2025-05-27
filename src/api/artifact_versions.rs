@@ -5,7 +5,7 @@ use serde_json::{Map, Value};
 
 use validator::Validate;
 
-use crate::{json_body, validators, Api};
+use crate::{json_body, list_params::ListParams, validators, Api};
 
 use super::{Error, Validation};
 use snafu::ResultExt;
@@ -59,10 +59,8 @@ pub struct DeleteArtifactVersionResponse {}
 
 #[derive(Debug, Serialize)]
 pub struct ListArtifactVersionsParams {
-    pub limit: Option<u8>,
-    pub order: Option<String>,
-    pub search: String,
-    pub page: Option<String>,
+    #[serde(flatten)]
+    pub list: ListParams,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -141,24 +139,12 @@ impl<'a> ArtifactVersionsApi<'a> {
         &'a self,
         params: ListArtifactVersionsParams,
     ) -> Result<Option<ListArtifactVersionsResponse>, Error> {
-        let mut query_params = vec![("search".to_string(), params.search)];
-
-        if let Some(limit) = params.limit {
-            query_params.push(("limit".to_string(), limit.to_string()))
-        }
-        if let Some(order) = params.order {
-            query_params.push(("order".to_string(), order))
-        }
-
-        if let Some(page) = params.page {
-            query_params.push(("page".to_string(), page))
-        }
         self.0
             .execute_with_params(
                 Method::GET,
                 "/artifact_versions".to_string(),
                 None,
-                query_params,
+                params.list.to_query_params(),
             )
             .await
     }

@@ -1,101 +1,81 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
-use crate::{json_body, Api};
+use crate::{json_body, list_params::ListParams, Api};
 
 use super::Error;
 use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Product {
+    pub archived: bool,
+    pub inserted_at: String,
     pub name: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ListProductParams {
-    pub organization_name: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ListProductResponse {
-    pub data: Vec<Product>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct GetProductParams {
-    pub product_name: String,
-    pub organization_name: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct GetProductResponse {
-    pub data: Product,
-}
-
-#[derive(Debug, Serialize)]
-pub struct DeleteProductParams {
-    pub product_name: String,
-    pub organization_name: String,
+    pub prn: String,
+    pub updated_at: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct CreateProductParams {
-    pub organization_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub archived: Option<bool>,
     pub name: String,
+    pub organization_prn: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreateProductResponse {
-    pub data: Product,
+    pub product: Product,
+}
+
+#[derive(Debug, Serialize)]
+pub struct GetProductParams {
+    pub prn: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GetProductResponse {
+    pub product: Product,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ListProductsParams {
+    #[serde(flatten)]
+    pub list: ListParams,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ListProductsResponse {
+    pub products: Vec<Product>,
+    pub next_page: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct UpdateProductParams {
-    pub product_name: String,
-    pub organization_name: String,
-    pub product: UpdateProduct,
-}
-
-#[derive(Debug, Serialize)]
-pub struct UpdateProduct {
+    pub prn: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub archived: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UpdateProductResponse {
-    pub data: Product,
+    pub product: Product,
 }
 
-pub struct ProductApi<'a>(pub &'a Api);
+pub struct ProductsApi<'a>(pub &'a Api);
 
-impl<'a> ProductApi<'a> {
+impl<'a> ProductsApi<'a> {
     pub async fn create(
         &'a self,
         params: CreateProductParams,
     ) -> Result<Option<CreateProductResponse>, Error> {
-        let organization_name = &params.organization_name;
-
         self.0
-            .execute(
-                Method::POST,
-                format!("/orgs/{organization_name}/products"),
-                Some(json_body!(&params)),
-            )
-            .await
-    }
-
-    pub async fn delete(&'a self, params: DeleteProductParams) -> Result<Option<()>, Error> {
-        let product_name = params.product_name;
-        let organization_name = params.organization_name;
-
-        self.0
-            .execute(
-                Method::DELETE,
-                format!("/orgs/{organization_name}/products/{product_name}"),
-                None,
-            )
+            .execute(Method::POST, "/products", Some(json_body!(&params)))
             .await
     }
 
@@ -103,29 +83,22 @@ impl<'a> ProductApi<'a> {
         &'a self,
         params: GetProductParams,
     ) -> Result<Option<GetProductResponse>, Error> {
-        let product_name = params.product_name;
-        let organization_name = params.organization_name;
-
+        let product_prn: String = params.prn;
         self.0
-            .execute(
-                Method::GET,
-                format!("/orgs/{organization_name}/products/{product_name}"),
-                None,
-            )
+            .execute(Method::GET, format!("/products/{product_prn}"), None)
             .await
     }
 
     pub async fn list(
         &'a self,
-        params: ListProductParams,
-    ) -> Result<Option<ListProductResponse>, Error> {
-        let organization_name = params.organization_name;
-
+        params: ListProductsParams,
+    ) -> Result<Option<ListProductsResponse>, Error> {
         self.0
-            .execute(
+            .execute_with_params(
                 Method::GET,
-                format!("/orgs/{organization_name}/products"),
+                "/products".to_string(),
                 None,
+                params.list.to_query_params(),
             )
             .await
     }
@@ -134,13 +107,12 @@ impl<'a> ProductApi<'a> {
         &'a self,
         params: UpdateProductParams,
     ) -> Result<Option<UpdateProductResponse>, Error> {
-        let organization_name = &params.organization_name;
-        let product_name = &params.product_name;
+        let product_prn: &String = &params.prn;
 
         self.0
             .execute(
-                Method::PUT,
-                format!("/orgs/{organization_name}/products/{product_name}"),
+                Method::PATCH,
+                format!("/products/{product_prn}"),
                 Some(json_body!(&params)),
             )
             .await
