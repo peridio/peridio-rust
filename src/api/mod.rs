@@ -5,6 +5,7 @@ pub mod artifacts;
 pub mod binaries;
 pub mod binary_parts;
 pub mod binary_signatures;
+pub mod bundle_overrides;
 pub mod bundles;
 pub mod ca_certificates;
 pub mod cohorts;
@@ -35,6 +36,7 @@ pub use artifacts::ArtifactsApi;
 pub use binaries::BinariesApi;
 pub use binary_parts::BinaryPartsApi;
 pub use binary_signatures::BinarySignaturesApi;
+pub use bundle_overrides::BundleOverridesApi;
 pub use ca_certificates::CaCertificatesApi;
 pub use cohorts::CohortsApi;
 pub use device_certificates::DeviceCertificatesApi;
@@ -344,6 +346,10 @@ impl Api {
 
     pub fn artifact_versions(&self) -> ArtifactVersionsApi {
         ArtifactVersionsApi(self)
+    }
+
+    pub fn bundle_overrides(&self) -> BundleOverridesApi {
+        BundleOverridesApi(self)
     }
 
     pub fn bundles(&self) -> BundlesApi {

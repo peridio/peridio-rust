@@ -1,0 +1,27 @@
+{
+	"bundle_overrides": [
+		{
+			"name": "another override",
+			"description": "some description",
+			"inserted_at": "2025-04-03T18:40:23.721548Z",
+			"organization_prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9",
+			"prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9:bundle_override:61a5518b-7afb-4707-a611-b1a5c75904dc",
+			"updated_at": "2025-04-04T23:50:41.311192Z",
+			"ends_at": "2025-04-04T23:50:00.000000Z",
+			"starts_at": "2025-04-03T18:40:00.000000Z",
+			"bundle_prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9:bundle:7217e151-2cbe-4a6a-b763-52f7c8302707"
+		},
+		{
+			"name": "test override without description",
+			"description": null,
+			"inserted_at": "2025-04-02T10:20:30.123456Z",
+			"organization_prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9",
+			"prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9:bundle_override:71b6529c-8bfc-5818-b722-c2b6d86a15ed",
+			"updated_at": "2025-04-02T10:20:30.123456Z",
+			"ends_at": null,
+			"starts_at": "2025-04-02T10:20:00.000000Z",
+			"bundle_prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9:bundle:8328f262-3dcf-5b7b-c874-63g8d9f03818"
+		}
+	],
+	"next_page": null
+}
