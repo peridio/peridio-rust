@@ -33,7 +33,6 @@ async fn create_cohort() {
     let params = CreateCohortParams {
         description: Some(expected_description.to_string()),
         name: expected_name.to_string(),
-        organization_prn: expected_organization_prn.to_string(),
         product_prn: expected_product_prn.to_string(),
     };
 

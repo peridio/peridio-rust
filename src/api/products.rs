@@ -21,7 +21,6 @@ pub struct CreateProductParams {
     #[serde(default)]
     pub archived: Option<bool>,
     pub name: String,
-    pub organization_prn: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

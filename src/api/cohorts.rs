@@ -21,7 +21,6 @@ pub struct Cohort {
 pub struct CreateCohortParams {
     pub description: Option<String>,
     pub name: String,
-    pub organization_prn: String,
     pub product_prn: String,
 }
 

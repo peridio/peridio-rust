@@ -12,7 +12,6 @@ use peridio_sdk::api::ApiOptions;
 async fn create_product() {
     let mut server = Server::new_async().await;
     let expected_name = "name";
-    let expected_organization_prn = "organization_prn";
 
     let api = Api::new(ApiOptions {
         api_key: API_KEY.into(),
@@ -31,7 +30,6 @@ async fn create_product() {
     let params = CreateProductParams {
         archived: None,
         name: expected_name.to_string(),
-        organization_prn: expected_organization_prn.to_string(),
     };
 
     match api.products().create(params).await.unwrap() {

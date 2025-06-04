@@ -41,7 +41,6 @@ pub struct CreateReleaseParams {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub next_release_prn: Option<String>,
-    pub organization_prn: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub phase_mode: Option<String>,

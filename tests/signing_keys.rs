@@ -13,7 +13,6 @@ use peridio_sdk::api::ApiOptions;
 #[tokio::test]
 async fn create_signing_key() {
     let mut server = Server::new_async().await;
-    let organization_prn = "org-1";
     let expected_value = "a";
     let expected_name = "b";
     let api = Api::new(ApiOptions {
@@ -33,7 +32,6 @@ async fn create_signing_key() {
     let params = CreateSigningKeyParams {
         value: expected_value.to_string(),
         name: expected_name.to_string(),
-        organization_prn: organization_prn.to_string(),
     };
 
     match api.signing_keys().create(params).await.unwrap() {
