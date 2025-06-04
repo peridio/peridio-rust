@@ -1,0 +1,13 @@
+{
+	"bundle_override": {
+		"name": "updated override name",
+		"description": "updated description",
+		"inserted_at": "2025-04-03T18:40:23.721548Z",
+		"organization_prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9",
+		"prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9:bundle_override:61a5518b-7afb-4707-a611-b1a5c75904dc",
+		"updated_at": "2025-04-05T10:15:30.654321Z",
+		"ends_at": "2025-04-05T23:59:00.000000Z",
+		"starts_at": "2025-04-03T18:40:00.000000Z",
+		"bundle_prn": "prn:1:099195e1-6810-46c1-9195-8c34f57744e9:bundle:7217e151-2cbe-4a6a-b763-52f7c8302707"
+	}
+}
