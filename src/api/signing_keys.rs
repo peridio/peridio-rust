@@ -20,7 +20,6 @@ pub struct SigningKey {
 pub struct CreateSigningKeyParams {
     pub value: String,
     pub name: String,
-    pub organization_prn: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

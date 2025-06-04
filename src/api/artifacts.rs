@@ -30,7 +30,6 @@ pub struct CreateArtifactParams {
     #[serde(default)]
     pub id: Option<String>,
     pub name: String,
-    pub organization_prn: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

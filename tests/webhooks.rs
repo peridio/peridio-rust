@@ -14,7 +14,6 @@ async fn create_webhook() {
     let expected_url = "https://peridio.com";
     let expected_state = "disabled";
     let expected_description = "description";
-    let expected_organization_prn = "organization_prn";
     let expected_enabled_events = vec!["device.release_changed".to_string()];
 
     let api = Api::new(ApiOptions {
@@ -35,7 +34,6 @@ async fn create_webhook() {
         description: Some(expected_description.to_string()),
         enabled_events: Some(expected_enabled_events.clone()),
         url: expected_url.to_string(),
-        organization_prn: expected_organization_prn.to_string(),
     };
 
     match api.webhooks().create(params).await.unwrap() {

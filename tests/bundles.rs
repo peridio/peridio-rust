@@ -37,7 +37,6 @@ async fn create_bundle() {
         .await;
 
     let params = CreateBundleParams {
-        organization_prn: expected_organization_prn.to_string(),
         artifact_version_prns: expected_artifact_versions.clone(),
         id: Some(expected_id.to_string()),
         name: Some(expected_name.to_string()),

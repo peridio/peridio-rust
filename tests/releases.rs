@@ -47,7 +47,6 @@ async fn create_release() {
         disabled: None,
         name: expected_name.to_string(),
         next_release_prn: Some(expected_next_release_prn.to_string()),
-        organization_prn: expected_organization_prn.to_string(),
         phase_mode: None,
         phase_tags: None,
         phase_value: expected_phase_value.into(),

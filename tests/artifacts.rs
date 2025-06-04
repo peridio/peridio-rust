@@ -38,7 +38,6 @@ async fn create_artifact() {
         description: Some(expected_description.to_string()),
         id: Some(expected_id.to_string()),
         name: expected_name.to_string(),
-        organization_prn: expected_organization_prn.to_string(),
     };
 
     match api.artifacts().create(params).await.unwrap() {
@@ -77,7 +76,6 @@ async fn create_artifact() {
         description: Some(expected_description.to_string()),
         id: Some(expected_id.to_string()),
         name: expected_name.to_string(),
-        organization_prn: expected_organization_prn.to_string(),
     };
 
     match api.artifacts().create(params).await {
