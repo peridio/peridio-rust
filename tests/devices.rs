@@ -30,6 +30,7 @@ async fn create_device() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -72,6 +73,7 @@ async fn delete_device() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -107,6 +109,7 @@ async fn get_device() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -145,6 +148,7 @@ async fn list_devices() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -191,6 +195,7 @@ async fn update_device() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -241,6 +246,7 @@ async fn get_update_device() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server

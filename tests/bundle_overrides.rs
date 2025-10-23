@@ -27,6 +27,7 @@ async fn create_bundle_override() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -87,6 +88,7 @@ async fn delete_bundle_override() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -122,6 +124,7 @@ async fn get_bundle_override() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -177,6 +180,7 @@ async fn list_bundle_overrides() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -218,6 +222,7 @@ async fn update_bundle_override() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -269,6 +274,7 @@ async fn list_bundle_override_devices() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -318,6 +324,7 @@ async fn add_bundle_override_device() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -362,6 +369,7 @@ async fn remove_bundle_override_device() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server

@@ -1,0 +1,25 @@
+{
+  "bundle": {
+    "binaries": [
+      {
+        "prn": "binary_prn_1",
+        "custom_metadata": {
+          "version": "1.0.0",
+          "architecture": "arm64"
+        }
+      },
+      {
+        "prn": "binary_prn_2",
+        "custom_metadata": {
+          "version": "2.0.0",
+          "architecture": "x86_64"
+        }
+      }
+    ],
+    "organization_prn": "organization_prn",
+    "prn": "prn",
+    "inserted_at": "2000-01-01T00:00:00Z",
+    "updated_at": "2000-01-01T00:00:00Z",
+    "name": "v2_bundle"
+  }
+}

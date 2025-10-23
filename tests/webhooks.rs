@@ -20,6 +20,7 @@ async fn create_webhook() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -65,6 +66,7 @@ async fn get_webhook() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -108,6 +110,7 @@ async fn update_webhook() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server

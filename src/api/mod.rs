@@ -122,6 +122,7 @@ macro_rules! json_body {
 pub struct Api {
     api_key: String,
     endpoint: String,
+    pub api_version: u8,
     http: Client,
 }
 
@@ -129,6 +130,7 @@ pub struct ApiOptions {
     pub api_key: String,
     pub endpoint: Option<String>,
     pub ca_bundle_path: Option<PathBuf>,
+    pub api_version: u8,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -232,6 +234,7 @@ impl Api {
             endpoint: api_options
                 .endpoint
                 .unwrap_or_else(|| LATEST_ENDPOINT.into()),
+            api_version: api_options.api_version,
             http: client,
         }
     }
@@ -246,8 +249,7 @@ impl Api {
         P: AsRef<str> + Display,
         T: DeserializeOwned,
     {
-        self.execute_with_params_and_headers(method, path, body, vec![], vec![])
-            .await
+        self.execute_full(method, path, body, vec![], vec![]).await
     }
 
     async fn execute_with_params<P, T>(
@@ -261,8 +263,7 @@ impl Api {
         P: AsRef<str> + Display,
         T: DeserializeOwned,
     {
-        self.execute_with_params_and_headers(method, path, body, params, vec![])
-            .await
+        self.execute_full(method, path, body, params, vec![]).await
     }
 
     async fn execute_with_headers<P, T>(
@@ -276,11 +277,10 @@ impl Api {
         P: AsRef<str> + Display,
         T: DeserializeOwned,
     {
-        self.execute_with_params_and_headers(method, path, body, vec![], headers)
-            .await
+        self.execute_full(method, path, body, vec![], headers).await
     }
 
-    async fn execute_with_params_and_headers<P, T>(
+    async fn execute_full<P, T>(
         &self,
         method: Method,
         path: P,
@@ -301,12 +301,14 @@ impl Api {
                 HeaderValue::from_bytes(v.as_bytes()).unwrap(),
             );
         }
-        let req_builder = self
+        let mut req_builder = self
             .http
             .request(method.clone(), endpoint)
             .query(&params)
             .header("Authorization", format!("Token {}", &self.api_key))
             .headers(hmap);
+
+        req_builder = req_builder.header("x-api-version", self.api_version.to_string());
 
         let req = match body {
             Some(BodyType::Body((content_type, body))) => req_builder
@@ -340,71 +342,71 @@ impl Api {
         }
     }
 
-    pub fn artifacts(&self) -> ArtifactsApi {
+    pub fn artifacts(&self) -> ArtifactsApi<'_> {
         ArtifactsApi(self)
     }
 
-    pub fn artifact_versions(&self) -> ArtifactVersionsApi {
+    pub fn artifact_versions(&self) -> ArtifactVersionsApi<'_> {
         ArtifactVersionsApi(self)
     }
 
-    pub fn bundle_overrides(&self) -> BundleOverridesApi {
+    pub fn bundle_overrides(&self) -> BundleOverridesApi<'_> {
         BundleOverridesApi(self)
     }
 
-    pub fn bundles(&self) -> BundlesApi {
+    pub fn bundles(&self) -> BundlesApi<'_> {
         BundlesApi(self)
     }
 
-    pub fn binaries(&self) -> BinariesApi {
+    pub fn binaries(&self) -> BinariesApi<'_> {
         BinariesApi(self)
     }
 
-    pub fn binary_parts(&self) -> BinaryPartsApi {
+    pub fn binary_parts(&self) -> BinaryPartsApi<'_> {
         BinaryPartsApi(self)
     }
 
-    pub fn binary_signatures(&self) -> BinarySignaturesApi {
+    pub fn binary_signatures(&self) -> BinarySignaturesApi<'_> {
         BinarySignaturesApi(self)
     }
 
-    pub fn ca_certificates(&self) -> CaCertificatesApi {
+    pub fn ca_certificates(&self) -> CaCertificatesApi<'_> {
         CaCertificatesApi(self)
     }
 
-    pub fn cohorts(&self) -> CohortsApi {
+    pub fn cohorts(&self) -> CohortsApi<'_> {
         CohortsApi(self)
     }
 
-    pub fn devices(&self) -> DevicesApi {
+    pub fn devices(&self) -> DevicesApi<'_> {
         DevicesApi(self)
     }
 
-    pub fn device_certificates(&self) -> DeviceCertificatesApi {
+    pub fn device_certificates(&self) -> DeviceCertificatesApi<'_> {
         DeviceCertificatesApi(self)
     }
 
-    pub fn products(&self) -> ProductsApi {
+    pub fn products(&self) -> ProductsApi<'_> {
         ProductsApi(self)
     }
 
-    pub fn releases(&self) -> ReleasesApi {
+    pub fn releases(&self) -> ReleasesApi<'_> {
         ReleasesApi(self)
     }
 
-    pub fn signing_keys(&self) -> SigningKeysApi {
+    pub fn signing_keys(&self) -> SigningKeysApi<'_> {
         SigningKeysApi(self)
     }
 
-    pub fn tunnels(&self) -> TunnelsApi {
+    pub fn tunnels(&self) -> TunnelsApi<'_> {
         TunnelsApi(self)
     }
 
-    pub fn users(&self) -> UsersApi {
+    pub fn users(&self) -> UsersApi<'_> {
         UsersApi(self)
     }
 
-    pub fn webhooks(&self) -> WebhooksApi {
+    pub fn webhooks(&self) -> WebhooksApi<'_> {
         WebhooksApi(self)
     }
 }

@@ -1,13 +1,37 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 
 use crate::{json_body, list_params::ListParams, Api};
 
 use super::Error;
 use snafu::ResultExt;
 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct BundleBinary {
+    pub custom_metadata: Option<Map<String, Value>>,
+    pub prn: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum Bundle {
+    V1(BundleV1),
+    V2(BundleV2),
+}
+
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Bundle {
+pub struct BundleV2 {
+    pub binaries: Vec<BundleBinary>,
+    pub inserted_at: String,
+    pub organization_prn: String,
+    pub prn: String,
+    pub updated_at: String,
+    pub name: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct BundleV1 {
     pub artifact_versions: Vec<String>,
     pub inserted_at: String,
     pub organization_prn: String,
@@ -17,12 +41,32 @@ pub struct Bundle {
 }
 
 #[derive(Debug, Serialize)]
-pub struct CreateBundleParams {
+#[serde(untagged)]
+pub enum CreateBundleParams {
+    V1(CreateBundleParamsV1),
+    V2(CreateBundleParamsV2),
+}
+
+#[derive(Debug, Serialize)]
+pub struct CreateBundleParamsV1 {
     pub artifact_version_prns: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
     pub id: Option<String>,
     pub name: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CreateBundleParamsV2 {
+    pub binaries: Vec<CreateBundleBinary>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    pub name: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CreateBundleBinary {
+    pub prn: String,
+    pub custom_metadata: Option<Map<String, Value>>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
