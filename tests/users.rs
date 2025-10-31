@@ -24,6 +24,7 @@ async fn get_users_me_api() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     match api.users().me().await.unwrap() {

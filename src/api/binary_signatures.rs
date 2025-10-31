@@ -37,6 +37,30 @@ pub struct DeleteBinarySignatureParams {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DeleteBinarySignatureResponse {}
 
+// Command types for the command pattern
+#[derive(Debug)]
+pub struct CreateCommand {
+    pub params: CreateBinarySignatureParams,
+}
+
+#[derive(Debug)]
+pub struct DeleteCommand {
+    pub params: DeleteBinarySignatureParams,
+}
+
+#[derive(Debug)]
+pub struct Command<T> {
+    pub inner: T,
+    // Additional command metadata could go here
+    pub metadata: Option<String>,
+}
+
+#[derive(Debug)]
+pub enum BinarySignaturesCommand {
+    Create(Box<Command<CreateCommand>>),
+    Delete(Command<DeleteCommand>),
+}
+
 pub struct BinarySignaturesApi<'a>(pub &'a Api);
 
 impl<'a> BinarySignaturesApi<'a> {

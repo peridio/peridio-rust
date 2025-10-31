@@ -19,6 +19,7 @@ async fn create_signing_key() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -56,6 +57,7 @@ async fn delete_signing_key() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -87,6 +89,7 @@ async fn get_signing_key() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server

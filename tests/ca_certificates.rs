@@ -21,6 +21,7 @@ async fn create_ca_certificate() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -58,6 +59,7 @@ async fn delete_ca_certificate() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -90,6 +92,7 @@ async fn get_ca_certificate() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -131,6 +134,7 @@ async fn list_ca_certificate() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -175,6 +179,7 @@ async fn create_ca_verification_code() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server
@@ -212,6 +217,7 @@ async fn update_ca_certificate() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let m = server

@@ -21,6 +21,7 @@ async fn bad_params() {
         api_key: API_KEY.into(),
         endpoint: Some(server.url()),
         ca_bundle_path: None,
+        api_version: 1,
     });
 
     let result = api.users().me().await;
