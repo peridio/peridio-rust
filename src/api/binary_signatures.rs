@@ -20,8 +20,11 @@ pub struct BinarySignature {
 #[derive(Debug, Serialize)]
 pub struct CreateBinarySignatureParams {
     pub binary_prn: String,
-    pub signing_key_prn: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signing_key_prn: Option<String>,
     pub signature: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signing_key_keyid: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

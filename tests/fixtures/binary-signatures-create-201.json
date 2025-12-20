@@ -1,0 +1,11 @@
+{
+  "binary_signature": {
+    "binary_prn": "prn:1:o:abcd:b:binary-123",
+    "inserted_at": "2024-01-15T10:30:00Z",
+    "organization_prn": "prn:1:o:abcd",
+    "prn": "prn:1:o:abcd:bs:binary-signature-123",
+    "signature": "signature-abc123",
+    "signing_key_prn": "prn:1:o:abcd:sk:signing-key-123",
+    "updated_at": "2024-01-15T10:30:00Z"
+  }
+}
