@@ -10,6 +10,8 @@ async fn get_users_me_api() {
     let mut server = Server::new_async().await;
     let expected_email = "a@b.com";
     let expected_username = "c";
+    let expected_organization_prn =
+        "prn:1:be497d9d-f2c6-400c-8d7a-0b3d84aca292:organization:test-org";
     let path = "/users/me".to_string();
 
     let m = server
@@ -31,6 +33,7 @@ async fn get_users_me_api() {
         Some(users_me) => {
             assert_eq!(users_me.data.email, expected_email);
             assert_eq!(users_me.data.username, expected_username);
+            assert_eq!(users_me.data.organization_prn, expected_organization_prn);
         }
         _ => panic!(),
     }

@@ -11,6 +11,7 @@ pub struct User {
 pub struct UserData {
     pub email: String,
     pub username: String,
+    pub organization_prn: String,
 }
 
 pub struct UsersApi<'a>(pub &'a Api);
