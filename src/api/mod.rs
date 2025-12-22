@@ -6,6 +6,7 @@ pub mod binaries;
 pub mod binary_parts;
 pub mod binary_signatures;
 pub mod bundle_overrides;
+pub mod bundle_signatures;
 pub mod bundles;
 pub mod ca_certificates;
 pub mod cohorts;
@@ -15,6 +16,7 @@ pub mod error;
 pub mod events;
 pub mod products;
 pub mod releases;
+pub mod signature_common;
 pub mod signing_keys;
 pub mod tunnels;
 pub mod webhooks;
@@ -37,6 +39,7 @@ pub use binaries::BinariesApi;
 pub use binary_parts::BinaryPartsApi;
 pub use binary_signatures::BinarySignaturesApi;
 pub use bundle_overrides::BundleOverridesApi;
+pub use bundle_signatures::BundleSignaturesApi;
 pub use ca_certificates::CaCertificatesApi;
 pub use cohorts::CohortsApi;
 pub use device_certificates::DeviceCertificatesApi;
@@ -368,6 +371,10 @@ impl Api {
 
     pub fn binary_signatures(&self) -> BinarySignaturesApi<'_> {
         BinarySignaturesApi(self)
+    }
+
+    pub fn bundle_signatures(&self) -> BundleSignaturesApi<'_> {
+        BundleSignaturesApi(self)
     }
 
     pub fn ca_certificates(&self) -> CaCertificatesApi<'_> {

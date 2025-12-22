@@ -1,6 +1,7 @@
 {
   "data": {
     "email": "a@b.com",
-    "username": "c"
+    "username": "c",
+    "organization_prn": "prn:1:be497d9d-f2c6-400c-8d7a-0b3d84aca292:organization:test-org"
   }
 }

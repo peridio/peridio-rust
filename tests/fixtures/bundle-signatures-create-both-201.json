@@ -1,0 +1,11 @@
+{
+  "bundle_signature": {
+    "bundle_prn": "prn:1:o:abcd:b:bundle-789",
+    "inserted_at": "2024-01-15T10:30:00Z",
+    "organization_prn": "prn:1:o:abcd",
+    "prn": "prn:1:o:abcd:bs:bundle-signature-789",
+    "signature": "signature-both123",
+    "signing_key_prn": "prn:1:o:abcd:sk:signing-key-789",
+    "updated_at": "2024-01-15T10:30:00Z"
+  }
+}
