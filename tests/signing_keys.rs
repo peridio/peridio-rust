@@ -42,6 +42,7 @@ async fn create_signing_key() {
                 Some(expected_value.to_string())
             );
             assert_eq!(signing_key.signing_key.name, expected_name);
+            assert_eq!(signing_key.signing_key.keyid, "test-keyid-123");
         }
         _ => panic!(),
     }
@@ -111,6 +112,7 @@ async fn get_signing_key() {
                 Some(expected_value.to_string())
             );
             assert_eq!(signing_key.signing_key.name, expected_name);
+            assert_eq!(signing_key.signing_key.keyid, "test-keyid-456");
         }
         _ => panic!(),
     }

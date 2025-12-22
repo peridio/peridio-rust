@@ -53,6 +53,13 @@ pub use users::UsersApi;
 pub use webhooks::WebhooksApi;
 
 use self::artifact_versions::ArtifactVersionsApi;
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Signature {
+    pub signature: String,
+    pub signing_key_prn: String,
+    pub keyid: String,
+}
 use self::bundles::BundlesApi;
 
 const CERT_ADMIN_API: &[u8] = include_bytes!("../../certificates/admin-api.pem");

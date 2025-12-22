@@ -1,4 +1,4 @@
-use super::{Error, Validation};
+use super::{Error, Signature, Validation};
 
 use crate::{json_body, list_params::ListParams, validators, Api};
 
@@ -39,12 +39,6 @@ impl FromStr for BinaryState {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct BinarySignature {
-    pub signature: String,
-    pub signing_key_prn: String,
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Binary {
     pub artifact_version_prn: String,
     pub custom_metadata: Option<Map<String, Value>>,
@@ -54,7 +48,7 @@ pub struct Binary {
     pub prn: String,
     pub inserted_at: String,
     pub revision: u32,
-    pub signatures: Option<Vec<BinarySignature>>,
+    pub signatures: Option<Vec<Signature>>,
     pub size: Option<u64>,
     pub state: BinaryState,
     pub target: String,

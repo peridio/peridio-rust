@@ -28,6 +28,7 @@ macro_rules! signature_module {
         pub struct $signature_struct {
             pub $prn_field: String,
             pub inserted_at: String,
+            pub keyid: String,
             pub organization_prn: String,
             pub prn: String,
             pub signature: String,

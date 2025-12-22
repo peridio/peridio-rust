@@ -6,7 +6,7 @@ use serde_json::{Map, Value};
 
 use peridio_sdk::api::bundles::{
     Bundle, CreateBundleBinary, CreateBundleParams, CreateBundleParamsV1, CreateBundleParamsV2,
-    DeleteBundleParams, GetBundleParams, UpdateBundleParams,
+    DeleteBundleParams, GetBundleParams, ListBundleSignaturesParams, UpdateBundleParams,
 };
 
 use peridio_sdk::api::Api;
@@ -555,6 +555,66 @@ async fn update_bundle() {
             Bundle::V2(_) => panic!("Expected V1 bundle"),
         },
         _ => panic!(),
+    }
+
+    m.assert_async().await;
+}
+
+#[tokio::test]
+async fn list_bundle_signatures() {
+    let mut server = Server::new_async().await;
+    let bundle_prn = "prn:1:o:abcd:b:bundle-123";
+    let api = Api::new(ApiOptions {
+        api_key: API_KEY.into(),
+        endpoint: Some(server.url()),
+        ca_bundle_path: None,
+        api_version: 1,
+    });
+
+    let m = server
+        .mock("GET", &*format!("/bundles/{bundle_prn}/signatures"))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"{
+            "signatures": [
+                {
+                    "signature": "test-signature-1",
+                    "signing_key_prn": "prn:1:o:abcd:sk:signing-key-1",
+                    "keyid": "test-keyid-1"
+                },
+                {
+                    "signature": "test-signature-2",
+                    "signing_key_prn": "prn:1:o:abcd:sk:signing-key-2",
+                    "keyid": "test-keyid-2"
+                }
+            ]
+        }"#,
+        )
+        .create_async()
+        .await;
+
+    let params = ListBundleSignaturesParams {
+        bundle_prn: bundle_prn.to_string(),
+    };
+
+    match api.bundles().list_signatures(params).await.unwrap() {
+        Some(response) => {
+            assert_eq!(response.signatures.len(), 2);
+            assert_eq!(response.signatures[0].signature, "test-signature-1");
+            assert_eq!(
+                response.signatures[0].signing_key_prn,
+                "prn:1:o:abcd:sk:signing-key-1"
+            );
+            assert_eq!(response.signatures[0].keyid, "test-keyid-1");
+            assert_eq!(response.signatures[1].signature, "test-signature-2");
+            assert_eq!(
+                response.signatures[1].signing_key_prn,
+                "prn:1:o:abcd:sk:signing-key-2"
+            );
+            assert_eq!(response.signatures[1].keyid, "test-keyid-2");
+        }
+        _ => panic!("Expected bundle signatures response"),
     }
 
     m.assert_async().await;

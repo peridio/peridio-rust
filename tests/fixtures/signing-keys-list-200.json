@@ -4,6 +4,7 @@
       "value": "a",
       "name": "b",
       "inserted_at": "date1",
+      "keyid": "test-keyid-list-1",
       "organization_prn": "string",
       "prn": "string",
       "updated_at": "date2"
@@ -12,6 +13,7 @@
       "value": "c",
       "name": "d",
       "inserted_at": "date1",
+      "keyid": "test-keyid-list-2",
       "organization_prn": "string",
       "prn": "string",
       "updated_at": "date2"

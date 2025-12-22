@@ -4,7 +4,7 @@ use serde_json::{Map, Value};
 
 use crate::{json_body, list_params::ListParams, Api};
 
-use super::Error;
+use super::{Error, Signature};
 use snafu::ResultExt;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -117,6 +117,16 @@ pub struct UpdateBundleResponse {
     pub bundle: Bundle,
 }
 
+#[derive(Debug, Serialize)]
+pub struct ListBundleSignaturesParams {
+    pub bundle_prn: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ListBundleSignaturesResponse {
+    pub signatures: Vec<Signature>,
+}
+
 pub struct BundlesApi<'a>(pub &'a Api);
 
 impl<'a> BundlesApi<'a> {
@@ -174,6 +184,20 @@ impl<'a> BundlesApi<'a> {
                 Method::PATCH,
                 format!("/bundles/{bundle_prn}"),
                 Some(json_body!(&params)),
+            )
+            .await
+    }
+
+    pub async fn list_signatures(
+        &'a self,
+        params: ListBundleSignaturesParams,
+    ) -> Result<Option<ListBundleSignaturesResponse>, Error> {
+        let bundle_prn: String = params.bundle_prn;
+        self.0
+            .execute(
+                Method::GET,
+                format!("/bundles/{bundle_prn}/signatures"),
+                None,
             )
             .await
     }
