@@ -273,7 +273,11 @@ impl Api {
         }
 
         match status_code {
-            200..=201 => {
+            204 => {
+                debug!("Response body: <empty (204 No Content)>");
+                Ok(None)
+            }
+            200..=299 => {
                 let response_body = res.text().await.context(BadResponse)?;
 
                 // Try to format as JSON for debug logging
@@ -295,10 +299,6 @@ impl Api {
                         text_response: response_body,
                     })?;
                 Ok(Some(res))
-            }
-            204 => {
-                debug!("Response body: <empty (204 No Content)>");
-                Ok(None)
             }
             _ => {
                 let response_body = res.text().await.context(BadResponse)?;
