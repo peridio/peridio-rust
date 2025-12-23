@@ -21,6 +21,7 @@ pub mod signing_keys;
 pub mod tunnels;
 pub mod webhooks;
 
+use log::debug;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use reqwest::{header, Client, ClientBuilder, Method};
 use serde::de::DeserializeOwned;
@@ -229,6 +230,7 @@ impl Api {
         T: DeserializeOwned,
     {
         let endpoint = format!("{}{}", self.endpoint, path);
+        debug!("Making {} request to URL: {}", method, endpoint);
         let mut hmap = HeaderMap::new();
         let iter = headers.iter();
         for (k, v) in iter {
@@ -260,9 +262,33 @@ impl Api {
             .await
             .context(RequestFailed)?;
 
-        match res.status().as_u16() {
+        let status_code = res.status().as_u16();
+        debug!("Response status code: {}", status_code);
+
+        // Log peridio-request-id header if present
+        if let Some(request_id) = res.headers().get("peridio-request-id") {
+            if let Ok(request_id_str) = request_id.to_str() {
+                debug!("peridio-request-id: {}", request_id_str);
+            }
+        }
+
+        match status_code {
             200..=201 => {
                 let response_body = res.text().await.context(BadResponse)?;
+
+                // Try to format as JSON for debug logging
+                match serde_json::from_str::<serde_json::Value>(&response_body) {
+                    Ok(json_value) => {
+                        debug!(
+                            "Response body (JSON): {}",
+                            serde_json::to_string_pretty(&json_value)
+                                .unwrap_or(response_body.clone())
+                        );
+                    }
+                    Err(_) => {
+                        debug!("Response body (text): {}", response_body);
+                    }
+                }
 
                 let res =
                     serde_json::from_str(&response_body).context(JsonDeserializationFailure {
@@ -270,9 +296,26 @@ impl Api {
                     })?;
                 Ok(Some(res))
             }
-            204 => Ok(None),
-            status_code => {
+            204 => {
+                debug!("Response body: <empty (204 No Content)>");
+                Ok(None)
+            }
+            _ => {
                 let response_body = res.text().await.context(BadResponse)?;
+
+                // Try to format as JSON for debug logging
+                match serde_json::from_str::<serde_json::Value>(&response_body) {
+                    Ok(json_value) => {
+                        debug!(
+                            "Error response body (JSON): {}",
+                            serde_json::to_string_pretty(&json_value)
+                                .unwrap_or(response_body.clone())
+                        );
+                    }
+                    Err(_) => {
+                        debug!("Error response body (text): {}", response_body);
+                    }
+                }
 
                 // Try to parse as JSON error first
                 match serde_json::from_str::<crate::api::error::ApiError>(&response_body) {
