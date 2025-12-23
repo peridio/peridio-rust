@@ -31,8 +31,9 @@ impl FromStr for BinaryState {
             "signable" => Ok(BinaryState::Signable),
             "signed" => Ok(BinaryState::Signed),
             "destroyed" => Ok(BinaryState::Destroyed),
-            _ => Err(Error::Unknown {
-                error: format!("given binary state '{input}' is not supported"),
+            _ => Err(Error::HttpError {
+                status: 400,
+                response: format!("given binary state '{input}' is not supported"),
             }),
         }
     }

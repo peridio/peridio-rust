@@ -27,8 +27,8 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{self};
 use snafu::{ResultExt, Snafu};
-use std::collections::HashMap;
-use std::fmt::{self, Debug, Display};
+
+use std::fmt::{Debug, Display};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
@@ -94,23 +94,14 @@ pub enum Error {
         text_response: String,
     },
 
-    #[snafu(display("{}", error))]
-    Unknown { error: String },
+    #[snafu(display("API Error ({}): {}", status, error))]
+    StructuredError {
+        status: u16,
+        error: crate::api::error::ApiError,
+    },
 
-    #[snafu(display("{}", error))]
-    Unauthorized { error: UnauthorizedError },
-
-    #[snafu(display("{}", error))]
-    NotFound { error: NotFoundError },
-
-    #[snafu(display("{}", error))]
-    InternalServer { error: InternalServerError },
-
-    #[snafu(display("{}", error))]
-    Conflict { error: ConflictError },
-
-    #[snafu(display("{}", error))]
-    UnprocessableEntity { error: UnprocessableEntityError },
+    #[snafu(display("HTTP Error ({}): {}", status, response))]
+    HttpError { status: u16, response: String },
 
     #[snafu(display("Validation Errors: {}", source))]
     Validation { source: ValidationErrors },
@@ -141,71 +132,6 @@ pub struct ApiOptions {
     pub endpoint: Option<String>,
     pub ca_bundle_path: Option<PathBuf>,
     pub api_version: u8,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UnauthorizedError {
-    status: String,
-}
-
-impl fmt::Display for UnauthorizedError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct NotFoundError {
-    errors: NotFoundErrors,
-}
-
-impl fmt::Display for NotFoundError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct NotFoundErrors {
-    detail: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct InternalServerError {
-    errors: serde_json::Value,
-}
-
-impl fmt::Display for InternalServerError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ConflictError {
-    errors: HashMap<String, Vec<String>>,
-}
-
-impl fmt::Display for ConflictError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UnprocessableEntityError {
-    errors: HashMap<String, Vec<String>>,
-}
-
-impl fmt::Display for UnprocessableEntityError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
 }
 
 impl Api {
@@ -345,9 +271,23 @@ impl Api {
                 Ok(Some(res))
             }
             204 => Ok(None),
-            _ => {
-                let response = res.text().await.context(BadResponse)?;
-                Err(Error::Unknown { error: response })
+            status_code => {
+                let response_body = res.text().await.context(BadResponse)?;
+
+                // Try to parse as JSON error first
+                match serde_json::from_str::<crate::api::error::ApiError>(&response_body) {
+                    Ok(api_error) => Err(Error::StructuredError {
+                        status: status_code,
+                        error: api_error,
+                    }),
+                    Err(_) => {
+                        // If JSON parsing fails, return HTTP error with raw response
+                        Err(Error::HttpError {
+                            status: status_code,
+                            response: response_body,
+                        })
+                    }
+                }
             }
         }
     }
