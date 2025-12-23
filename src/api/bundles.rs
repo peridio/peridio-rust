@@ -28,6 +28,7 @@ pub struct BundleV2 {
     pub prn: String,
     pub updated_at: String,
     pub name: Option<String>,
+    pub hash: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

@@ -673,7 +673,8 @@ async fn test_bundle_deserialization() {
         "prn": "prn",
         "inserted_at": "2000-01-01T00:00:00Z",
         "updated_at": "2000-01-01T00:00:00Z",
-        "name": "v2_bundle"
+        "name": "v2_bundle",
+        "hash": "abc123def456"
     }
     "#;
 
@@ -686,6 +687,7 @@ async fn test_bundle_deserialization() {
             assert_eq!(bundle.prn, "prn");
             assert_eq!(bundle.inserted_at, "2000-01-01T00:00:00Z");
             assert_eq!(bundle.updated_at, "2000-01-01T00:00:00Z");
+            assert_eq!(bundle.hash, "abc123def456");
 
             // Test first binary with custom metadata
             let binary_1 = &bundle.binaries[0];
@@ -743,7 +745,8 @@ async fn test_bundle_edge_cases() {
         "prn": "bundle_prn",
         "inserted_at": "2000-01-01T00:00:00Z",
         "updated_at": "2000-01-01T00:00:00Z",
-        "name": null
+        "name": null,
+        "hash": "sha256:empty"
     }
     "#;
 
@@ -779,7 +782,8 @@ async fn test_bundle_edge_cases() {
         "prn": "bundle_prn",
         "inserted_at": "2000-01-01T00:00:00Z",
         "updated_at": "2000-01-01T00:00:00Z",
-        "name": "test_bundle"
+        "name": "test_bundle",
+        "hash": "sha256:missing_metadata_test"
     }
     "#;
 
@@ -832,7 +836,8 @@ async fn test_custom_metadata_scenarios() {
         "prn": "bundle_prn",
         "inserted_at": "2000-01-01T00:00:00Z",
         "updated_at": "2000-01-01T00:00:00Z",
-        "name": "test_bundle"
+        "name": "test_bundle",
+        "hash": "sha256:metadata_test"
     }
     "#;
 
@@ -986,7 +991,8 @@ async fn test_list_bundles_v2() {
                     "prn": "bundle_prn_1",
                     "inserted_at": "2000-01-01T00:00:00Z",
                     "updated_at": "2000-01-01T00:00:00Z",
-                    "name": "v2_bundle_1"
+                    "name": "v2_bundle_1",
+                    "hash": "sha256:abcdef123456"
                 }
             ],
             "next_page": null
@@ -1019,4 +1025,123 @@ async fn test_list_bundles_v2() {
     }
 
     m.assert_async().await;
+}
+
+#[tokio::test]
+async fn test_bundle_v2_hash_field() {
+    // Test V2 bundle with hash field
+    let v2_json = r#"
+    {
+        "binaries": [
+            {
+                "prn": "binary_prn_1"
+            }
+        ],
+        "organization_prn": "org_prn",
+        "prn": "bundle_prn",
+        "inserted_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "name": "test_bundle",
+        "hash": "sha256:abcdef123456789"
+    }
+    "#;
+
+    let bundle: Bundle = serde_json::from_str(v2_json).unwrap();
+    match &bundle {
+        Bundle::V2(bundle_v2) => {
+            assert_eq!(bundle_v2.hash, "sha256:abcdef123456789");
+            assert_eq!(bundle_v2.name, Some("test_bundle".to_string()));
+            assert_eq!(bundle_v2.binaries.len(), 1);
+            assert_eq!(bundle_v2.organization_prn, "org_prn");
+            assert_eq!(bundle_v2.prn, "bundle_prn");
+        }
+        Bundle::V1(_) => panic!("Expected V2 bundle"),
+    }
+
+    // Test serialization includes hash field
+    let serialized = serde_json::to_string(&bundle).unwrap();
+    assert!(serialized.contains("sha256:abcdef123456789"));
+    assert!(serialized.contains("\"hash\":"));
+}
+
+#[tokio::test]
+async fn test_bundle_v2_hash_field_edge_cases() {
+    // Test with empty hash
+    let v2_json_empty_hash = r#"
+    {
+        "binaries": [],
+        "organization_prn": "org_prn",
+        "prn": "bundle_prn",
+        "inserted_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "name": null,
+        "hash": ""
+    }
+    "#;
+
+    let bundle: Bundle = serde_json::from_str(v2_json_empty_hash).unwrap();
+    match bundle {
+        Bundle::V2(bundle_v2) => {
+            assert_eq!(bundle_v2.hash, "");
+            assert_eq!(bundle_v2.name, None);
+            assert_eq!(bundle_v2.binaries.len(), 0);
+        }
+        Bundle::V1(_) => panic!("Expected V2 bundle"),
+    }
+
+    // Test with long hash value
+    let long_hash = "a".repeat(64);
+    let v2_json_long_hash = format!(
+        r#"
+    {{
+        "binaries": [
+            {{
+                "prn": "binary_prn_1"
+            }}
+        ],
+        "organization_prn": "org_prn",
+        "prn": "bundle_prn",
+        "inserted_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "name": "long_hash_bundle",
+        "hash": "{}"
+    }}
+    "#,
+        long_hash
+    );
+
+    let bundle: Bundle = serde_json::from_str(&v2_json_long_hash).unwrap();
+    match bundle {
+        Bundle::V2(bundle_v2) => {
+            assert_eq!(bundle_v2.hash, long_hash);
+            assert_eq!(bundle_v2.hash.len(), 64);
+        }
+        Bundle::V1(_) => panic!("Expected V2 bundle"),
+    }
+
+    // Test with special characters in hash
+    let v2_json_special_hash = r#"
+    {
+        "binaries": [
+            {
+                "prn": "binary_prn_1"
+            }
+        ],
+        "organization_prn": "org_prn",
+        "prn": "bundle_prn",
+        "inserted_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "name": "special_hash_bundle",
+        "hash": "sha256:abc123-def456_789"
+    }
+    "#;
+
+    let bundle: Bundle = serde_json::from_str(v2_json_special_hash).unwrap();
+    match bundle {
+        Bundle::V2(bundle_v2) => {
+            assert_eq!(bundle_v2.hash, "sha256:abc123-def456_789");
+            assert_eq!(bundle_v2.name, Some("special_hash_bundle".to_string()));
+        }
+        Bundle::V1(_) => panic!("Expected V2 bundle"),
+    }
 }
