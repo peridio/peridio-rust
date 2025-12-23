@@ -4,7 +4,8 @@ use common::API_KEY;
 use mockito::Server;
 
 use peridio_sdk::api::binaries::{
-    BinaryState, CreateBinaryParams, DeleteBinaryParams, GetBinaryParams, UpdateBinaryParams,
+    BinaryState, CreateBinaryParams, DeleteBinaryParams, GetBinaryDownloadUrlParams,
+    GetBinaryParams, UpdateBinaryParams,
 };
 
 use peridio_sdk::api::Api;
@@ -280,4 +281,39 @@ async fn update_binary() {
     }
 
     m.expect(0);
+}
+
+#[tokio::test]
+async fn get_binary_download_url() {
+    let mut server = Server::new_async().await;
+    let expected_prn = "prn";
+    let expected_download_url = "https://mock.download.url/binary/download/g2gCbQAAAA1tZW1vcnktYnVja2V0bQAAAFJiaW5hcmllcy8yYmU0YTkxYS1hNzI5LTRkMTItYjc5OC01YzhhMWVmODYyOTEvMTM1MWM3NDUtNWZhYy00ZTBmLThmZDYtNjYwYzkzYzNmY2Nj";
+
+    let api = Api::new(ApiOptions {
+        api_key: API_KEY.into(),
+        endpoint: Some(server.url()),
+        ca_bundle_path: None,
+        api_version: 1,
+    });
+
+    let m = server
+        .mock("GET", &*format!("/binaries/{expected_prn}/download_url"))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/binaries-download-url-200.json")
+        .create_async()
+        .await;
+
+    let params = GetBinaryDownloadUrlParams {
+        prn: expected_prn.to_string(),
+    };
+
+    match api.binaries().download_url(params).await.unwrap() {
+        Some(response) => {
+            assert_eq!(response.download_url, expected_download_url.to_string());
+        }
+        _ => panic!(),
+    }
+
+    m.assert_async().await;
 }

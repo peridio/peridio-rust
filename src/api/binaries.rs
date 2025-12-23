@@ -79,6 +79,16 @@ pub struct GetBinaryParams {
     pub prn: String,
 }
 
+#[derive(Debug, Serialize)]
+pub struct GetBinaryDownloadUrlParams {
+    pub prn: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GetBinaryDownloadUrlResponse {
+    pub download_url: String,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DeleteBinaryParams {
     pub prn: String,
@@ -199,5 +209,19 @@ impl<'a> BinariesApi<'a> {
             }
             Err(err) => Err(err),
         }
+    }
+
+    pub async fn download_url(
+        &'a self,
+        params: GetBinaryDownloadUrlParams,
+    ) -> Result<Option<GetBinaryDownloadUrlResponse>, Error> {
+        let binary_prn: String = params.prn;
+        self.0
+            .execute(
+                Method::GET,
+                format!("/binaries/{binary_prn}/download_url"),
+                None,
+            )
+            .await
     }
 }
