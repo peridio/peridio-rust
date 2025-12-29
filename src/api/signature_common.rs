@@ -8,6 +8,8 @@ macro_rules! signature_module {
         $create_response:ident,
         $delete_params:ident,
         $delete_response:ident,
+        $list_params:ident,
+        $list_response:ident,
         $create_command:ident,
         $delete_command:ident,
         $signatures_command:ident,
@@ -19,7 +21,7 @@ macro_rules! signature_module {
         use reqwest::Method;
         use serde::{Deserialize, Serialize};
 
-        use $crate::{json_body, Api};
+        use $crate::{json_body, list_params::ListParams, Api};
 
         use super::Error;
         use snafu::ResultExt;
@@ -58,6 +60,18 @@ macro_rules! signature_module {
 
         #[derive(Debug, Deserialize, Serialize)]
         pub struct $delete_response {}
+
+        #[derive(Debug, Serialize)]
+        pub struct $list_params {
+            #[serde(flatten)]
+            pub list: ListParams,
+        }
+
+        #[derive(Debug, Deserialize, Serialize)]
+        pub struct $list_response {
+            pub $module_name: Vec<$signature_struct>,
+            pub next_page: Option<String>,
+        }
 
         // Command types for the command pattern
         #[derive(Debug)]
@@ -102,6 +116,20 @@ macro_rules! signature_module {
                 let prn: String = params.$prn_param;
                 self.0
                     .execute(Method::DELETE, format!("{}/{prn}", $endpoint), None)
+                    .await
+            }
+
+            pub async fn list(
+                &'a self,
+                params: $list_params,
+            ) -> Result<Option<$list_response>, Error> {
+                self.0
+                    .execute_with_params(
+                        Method::GET,
+                        $endpoint.to_string(),
+                        None,
+                        params.list.to_query_params(),
+                    )
                     .await
             }
         }

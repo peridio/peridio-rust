@@ -1,0 +1,25 @@
+{
+  "binary_signatures": [
+    {
+      "binary_prn": "prn:1:o:abcd:b:binary-123",
+      "inserted_at": "2024-01-15T10:30:00Z",
+      "keyid": "keyid-123",
+      "organization_prn": "prn:1:o:abcd",
+      "prn": "prn:1:o:abcd:bs:binary-signature-123",
+      "signature": "signature-abc123",
+      "signing_key_prn": "prn:1:o:abcd:sk:signing-key-123",
+      "updated_at": "2024-01-15T10:30:00Z"
+    },
+    {
+      "binary_prn": "prn:1:o:abcd:b:binary-456",
+      "inserted_at": "2024-01-15T11:45:00Z",
+      "keyid": "keyid-456",
+      "organization_prn": "prn:1:o:abcd",
+      "prn": "prn:1:o:abcd:bs:binary-signature-456",
+      "signature": "signature-xyz789",
+      "signing_key_prn": "prn:1:o:abcd:sk:signing-key-456",
+      "updated_at": "2024-01-15T11:45:00Z"
+    }
+  ],
+  "next_page": "next-page-token"
+}

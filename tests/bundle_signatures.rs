@@ -4,11 +4,12 @@ use common::API_KEY;
 use mockito::Server;
 
 use peridio_sdk::api::bundle_signatures::{
-    CreateBundleSignatureParams, DeleteBundleSignatureParams,
+    CreateBundleSignatureParams, DeleteBundleSignatureParams, ListBundleSignaturesParams,
 };
 
 use peridio_sdk::api::Api;
 use peridio_sdk::api::ApiOptions;
+use peridio_sdk::list_params::ListParams;
 
 #[tokio::test]
 async fn create_bundle_signature_with_signing_key_prn() {
@@ -260,4 +261,46 @@ async fn create_bundle_signature_serialization_excludes_none_values() {
     let json = serde_json::to_string(&params_with_neither).unwrap();
     assert!(!json.contains("signing_key_prn"));
     assert!(!json.contains("signing_key_keyid"));
+}
+
+#[tokio::test]
+async fn list_bundle_signatures() {
+    let mut server = Server::new_async().await;
+
+    let api = Api::new(ApiOptions {
+        api_key: API_KEY.into(),
+        endpoint: Some(server.url()),
+        ca_bundle_path: None,
+        api_version: 1,
+    });
+
+    let m = server
+        .mock("GET", "/bundle_signatures")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body_from_file("tests/fixtures/bundle-signatures-list-200.json")
+        .create_async()
+        .await;
+
+    let params = ListBundleSignaturesParams {
+        list: ListParams::default(),
+    };
+
+    match api.bundle_signatures().list(params).await.unwrap() {
+        Some(response) => {
+            assert_eq!(response.bundle_signatures.len(), 2);
+            assert_eq!(
+                response.bundle_signatures[0].bundle_prn,
+                "prn:1:o:abcd:b:bundle-123"
+            );
+            assert_eq!(
+                response.bundle_signatures[1].bundle_prn,
+                "prn:1:o:abcd:b:bundle-456"
+            );
+            assert_eq!(response.next_page, Some("next-page-token".to_string()));
+        }
+        _ => panic!("Expected bundle signatures list response"),
+    }
+
+    m.assert_async().await;
 }
