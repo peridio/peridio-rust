@@ -1,13 +1,15 @@
 use crate::signature_module;
 
 signature_module!(
-    binary_signature,
+    binary_signatures,
     binary_signature,
     BinarySignature,
     CreateBinarySignatureParams,
     CreateBinarySignatureResponse,
     DeleteBinarySignatureParams,
     DeleteBinarySignatureResponse,
+    ListBinarySignaturesParams,
+    ListBinarySignaturesResponse,
     CreateCommand,
     DeleteCommand,
     BinarySignaturesCommand,

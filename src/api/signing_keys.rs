@@ -10,6 +10,7 @@ use snafu::ResultExt;
 pub struct SigningKey {
     pub value: Option<String>,
     pub inserted_at: String,
+    pub keyid: String,
     pub name: String,
     pub organization_prn: String,
     pub prn: String,

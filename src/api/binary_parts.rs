@@ -27,8 +27,9 @@ impl FromStr for BinaryPartState {
             "invalid_size" => Ok(BinaryPartState::InvalidHash),
             "invalid_hash" => Ok(BinaryPartState::InvalidSize),
             "valid" => Ok(BinaryPartState::Valid),
-            _ => Err(Error::Unknown {
-                error: format!("given binary part state '{input}' is not supported"),
+            _ => Err(Error::HttpError {
+                status: 400,
+                response: format!("given binary part state '{input}' is not supported"),
             }),
         }
     }

@@ -1,13 +1,15 @@
 use crate::signature_module;
 
 signature_module!(
-    bundle_signature,
+    bundle_signatures,
     bundle_signature,
     BundleSignature,
     CreateBundleSignatureParams,
     CreateBundleSignatureResponse,
     DeleteBundleSignatureParams,
     DeleteBundleSignatureResponse,
+    ListBundleSignaturesParams,
+    ListBundleSignaturesResponse,
     CreateCommand,
     DeleteCommand,
     BundleSignaturesCommand,

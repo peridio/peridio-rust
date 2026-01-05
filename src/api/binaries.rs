@@ -1,4 +1,4 @@
-use super::{Error, Validation};
+use super::{Error, Signature, Validation};
 
 use crate::{json_body, list_params::ListParams, validators, Api};
 
@@ -31,17 +31,12 @@ impl FromStr for BinaryState {
             "signable" => Ok(BinaryState::Signable),
             "signed" => Ok(BinaryState::Signed),
             "destroyed" => Ok(BinaryState::Destroyed),
-            _ => Err(Error::Unknown {
-                error: format!("given binary state '{input}' is not supported"),
+            _ => Err(Error::HttpError {
+                status: 400,
+                response: format!("given binary state '{input}' is not supported"),
             }),
         }
     }
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct BinarySignature {
-    pub signature: String,
-    pub signing_key_prn: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -54,7 +49,7 @@ pub struct Binary {
     pub prn: String,
     pub inserted_at: String,
     pub revision: u32,
-    pub signatures: Option<Vec<BinarySignature>>,
+    pub signatures: Option<Vec<Signature>>,
     pub size: Option<u64>,
     pub state: BinaryState,
     pub target: String,
@@ -83,6 +78,16 @@ pub struct CreateBinaryResponse {
 #[derive(Debug, Serialize)]
 pub struct GetBinaryParams {
     pub prn: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct GetBinaryDownloadUrlParams {
+    pub prn: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GetBinaryDownloadUrlResponse {
+    pub download_url: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -205,5 +210,19 @@ impl<'a> BinariesApi<'a> {
             }
             Err(err) => Err(err),
         }
+    }
+
+    pub async fn download_url(
+        &'a self,
+        params: GetBinaryDownloadUrlParams,
+    ) -> Result<Option<GetBinaryDownloadUrlResponse>, Error> {
+        let binary_prn: String = params.prn;
+        self.0
+            .execute(
+                Method::GET,
+                format!("/binaries/{binary_prn}/download_url"),
+                None,
+            )
+            .await
     }
 }

@@ -3,6 +3,7 @@
     "value": "a",
     "name": "b",
     "inserted_at": "date1",
+    "keyid": "test-keyid-123",
     "organization_prn": "string",
     "prn": "string",
     "updated_at": "date2"

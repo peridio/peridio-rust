@@ -21,14 +21,15 @@ pub mod signing_keys;
 pub mod tunnels;
 pub mod webhooks;
 
+use log::debug;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use reqwest::{header, Client, ClientBuilder, Method};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{self};
 use snafu::{ResultExt, Snafu};
-use std::collections::HashMap;
-use std::fmt::{self, Debug, Display};
+
+use std::fmt::{Debug, Display};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
@@ -53,6 +54,13 @@ pub use users::UsersApi;
 pub use webhooks::WebhooksApi;
 
 use self::artifact_versions::ArtifactVersionsApi;
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Signature {
+    pub signature: String,
+    pub signing_key_prn: String,
+    pub keyid: String,
+}
 use self::bundles::BundlesApi;
 
 const CERT_ADMIN_API: &[u8] = include_bytes!("../../certificates/admin-api.pem");
@@ -87,23 +95,14 @@ pub enum Error {
         text_response: String,
     },
 
-    #[snafu(display("{}", error))]
-    Unknown { error: String },
+    #[snafu(display("API Error ({}): {}", status, error))]
+    StructuredError {
+        status: u16,
+        error: crate::api::error::ApiError,
+    },
 
-    #[snafu(display("{}", error))]
-    Unauthorized { error: UnauthorizedError },
-
-    #[snafu(display("{}", error))]
-    NotFound { error: NotFoundError },
-
-    #[snafu(display("{}", error))]
-    InternalServer { error: InternalServerError },
-
-    #[snafu(display("{}", error))]
-    Conflict { error: ConflictError },
-
-    #[snafu(display("{}", error))]
-    UnprocessableEntity { error: UnprocessableEntityError },
+    #[snafu(display("HTTP Error ({}): {}", status, response))]
+    HttpError { status: u16, response: String },
 
     #[snafu(display("Validation Errors: {}", source))]
     Validation { source: ValidationErrors },
@@ -134,71 +133,6 @@ pub struct ApiOptions {
     pub endpoint: Option<String>,
     pub ca_bundle_path: Option<PathBuf>,
     pub api_version: u8,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UnauthorizedError {
-    status: String,
-}
-
-impl fmt::Display for UnauthorizedError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct NotFoundError {
-    errors: NotFoundErrors,
-}
-
-impl fmt::Display for NotFoundError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct NotFoundErrors {
-    detail: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct InternalServerError {
-    errors: serde_json::Value,
-}
-
-impl fmt::Display for InternalServerError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ConflictError {
-    errors: HashMap<String, Vec<String>>,
-}
-
-impl fmt::Display for ConflictError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UnprocessableEntityError {
-    errors: HashMap<String, Vec<String>>,
-}
-
-impl fmt::Display for UnprocessableEntityError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let j = serde_json::to_string(&self).unwrap();
-        write!(f, "{j}")
-    }
 }
 
 impl Api {
@@ -296,6 +230,7 @@ impl Api {
         T: DeserializeOwned,
     {
         let endpoint = format!("{}{}", self.endpoint, path);
+        debug!("Making {} request to URL: {}", method, endpoint);
         let mut hmap = HeaderMap::new();
         let iter = headers.iter();
         for (k, v) in iter {
@@ -327,9 +262,37 @@ impl Api {
             .await
             .context(RequestFailed)?;
 
-        match res.status().as_u16() {
-            200..=201 => {
+        let status_code = res.status().as_u16();
+        debug!("Response status code: {}", status_code);
+
+        // Log peridio-request-id header if present
+        if let Some(request_id) = res.headers().get("peridio-request-id") {
+            if let Ok(request_id_str) = request_id.to_str() {
+                debug!("peridio-request-id: {}", request_id_str);
+            }
+        }
+
+        match status_code {
+            204 => {
+                debug!("Response body: <empty (204 No Content)>");
+                Ok(None)
+            }
+            200..=299 => {
                 let response_body = res.text().await.context(BadResponse)?;
+
+                // Try to format as JSON for debug logging
+                match serde_json::from_str::<serde_json::Value>(&response_body) {
+                    Ok(json_value) => {
+                        debug!(
+                            "Response body (JSON): {}",
+                            serde_json::to_string_pretty(&json_value)
+                                .unwrap_or(response_body.clone())
+                        );
+                    }
+                    Err(_) => {
+                        debug!("Response body (text): {}", response_body);
+                    }
+                }
 
                 let res =
                     serde_json::from_str(&response_body).context(JsonDeserializationFailure {
@@ -337,10 +300,37 @@ impl Api {
                     })?;
                 Ok(Some(res))
             }
-            204 => Ok(None),
             _ => {
-                let response = res.text().await.context(BadResponse)?;
-                Err(Error::Unknown { error: response })
+                let response_body = res.text().await.context(BadResponse)?;
+
+                // Try to format as JSON for debug logging
+                match serde_json::from_str::<serde_json::Value>(&response_body) {
+                    Ok(json_value) => {
+                        debug!(
+                            "Error response body (JSON): {}",
+                            serde_json::to_string_pretty(&json_value)
+                                .unwrap_or(response_body.clone())
+                        );
+                    }
+                    Err(_) => {
+                        debug!("Error response body (text): {}", response_body);
+                    }
+                }
+
+                // Try to parse as JSON error first
+                match serde_json::from_str::<crate::api::error::ApiError>(&response_body) {
+                    Ok(api_error) => Err(Error::StructuredError {
+                        status: status_code,
+                        error: api_error,
+                    }),
+                    Err(_) => {
+                        // If JSON parsing fails, return HTTP error with raw response
+                        Err(Error::HttpError {
+                            status: status_code,
+                            response: response_body,
+                        })
+                    }
+                }
             }
         }
     }

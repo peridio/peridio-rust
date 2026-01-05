@@ -1,0 +1,14 @@
+{
+  "errors": {
+    "email": [
+      "can't be blank",
+      "is invalid"
+    ],
+    "password": [
+      "is too short (minimum is 8 characters)"
+    ],
+    "name": [
+      "can't be blank"
+    ]
+  }
+}

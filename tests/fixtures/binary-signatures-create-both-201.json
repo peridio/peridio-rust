@@ -2,6 +2,7 @@
   "binary_signature": {
     "binary_prn": "prn:1:o:abcd:b:binary-789",
     "inserted_at": "2024-01-15T10:30:00Z",
+    "keyid": "keyid-both123",
     "organization_prn": "prn:1:o:abcd",
     "prn": "prn:1:o:abcd:bs:binary-signature-789",
     "signature": "signature-both123",
